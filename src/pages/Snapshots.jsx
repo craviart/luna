@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHea
 import { supabase } from '../lib/supabase-simple'
 import { Camera, Calendar, Clock, Download, Eye, RefreshCw, Zap } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
+import { mockCaptureScreenshot, isDevelopment } from '../lib/screenshot-mock'
 
 // Clean URL utility function
 const cleanUrl = (url) => {
@@ -84,13 +85,19 @@ function Snapshots() {
 
   const captureScreenshot = async (urlId, url) => {
     try {
-      const response = await fetch('/api/capture-screenshot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, urlId })
-      })
+      let result
+      if (isDevelopment()) {
+        console.log('🧪 Using mock screenshot API for local development')
+        result = await mockCaptureScreenshot(url, urlId)
+      } else {
+        const response = await fetch('/api/capture-screenshot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, urlId })
+        })
+        result = await response.json()
+      }
 
-      const result = await response.json()
       if (result.success) {
         await fetchScreenshots() // Refresh screenshots
         return true
@@ -211,18 +218,24 @@ function Snapshots() {
         }
       }, 800)
 
-      // Call screenshot API (without urlId for test captures)
-      const response = await fetch('/api/capture-screenshot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          url: validation.url,
-          urlId: 'test-' + Date.now() // Use a test ID
+      // Call screenshot API or mock in development
+      let result
+      if (isDevelopment()) {
+        console.log('🧪 Using mock screenshot API for local development')
+        clearInterval(progressInterval)
+        result = await mockCaptureScreenshot(validation.url, 'test-' + Date.now())
+      } else {
+        const response = await fetch('/api/capture-screenshot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            url: validation.url,
+            urlId: 'test-' + Date.now() // Use a test ID
+          })
         })
-      })
-
-      clearInterval(progressInterval)
-      const result = await response.json()
+        clearInterval(progressInterval)
+        result = await response.json()
+      }
 
       if (result.success) {
         setTestProgress(100)
