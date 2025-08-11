@@ -175,9 +175,13 @@ export default function Dashboard() {
     const centerX = 90
     const centerY = 75
     
-    // Calculate end point of the arc
-    const endX = centerX + radius * Math.cos((180 - angle) * Math.PI / 180)
-    const endY = centerY - radius * Math.sin((180 - angle) * Math.PI / 180)
+    // Start point is the leftmost point of the semicircle (same as background)
+    const startX = 20  // Same as background arc start
+    const startY = 75  // Same as background arc start
+    
+    // Calculate end point of the arc based on angle from the start
+    const endX = centerX - radius * Math.cos((angle) * Math.PI / 180)
+    const endY = centerY - radius * Math.sin((angle) * Math.PI / 180)
     
     // Large arc flag for SVG path
     const largeArcFlag = angle > 180 ? 1 : 0
@@ -196,7 +200,7 @@ export default function Dashboard() {
           {/* Colored arc based on score - only show the portion based on percentage */}
           {percentage > 0 && (
             <path
-              d={`M 20 75 A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY}`}
+              d={`M ${startX} ${startY} A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY}`}
               stroke={getPerformanceColor(score)}
               strokeWidth="8"
               fill="none"
