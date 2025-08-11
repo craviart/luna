@@ -1,0 +1,28 @@
+{
+  "functions": {
+    "api/analyze-pagespeed-only.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/cron-analyze.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron-analyze",
+      "schedule": "0 9 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

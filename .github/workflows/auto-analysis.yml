@@ -1,0 +1,41 @@
+name: 🔄 Automatic Website Analysis
+
+on:
+  schedule:
+    # Run 3 times daily: 6 AM, 2 PM, and 10 PM UTC
+    - cron: '0 6 * * *'   # 6:00 AM UTC
+    - cron: '0 14 * * *'  # 2:00 PM UTC  
+    - cron: '0 22 * * *'  # 10:00 PM UTC
+  
+  # Allow manual triggering from GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: 🔍 Trigger Luna Analytics Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📊 Run Automatic Analysis
+        run: |
+          echo "🚀 Starting Luna Analytics automatic analysis at $(date)"
+          echo "🌐 Triggering analysis via: https://millie-static.vercel.app/api/cron-analyze"
+          
+          # Make the API call and capture response
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X GET "https://millie-static.vercel.app/api/cron-analyze" \
+            -H "User-Agent: GitHub-Actions-Luna-Analytics/1.0")
+          
+          echo "📈 API Response Code: $response"
+          
+          # Check if the request was successful
+          if [ $response -eq 200 ]; then
+            echo "✅ Analysis triggered successfully!"
+            echo "📊 All monitored URLs will be analyzed automatically"
+          else
+            echo "❌ Analysis failed with HTTP status: $response"
+            echo "🔧 Please check the Vercel function logs for details"
+            exit 1
+          fi
+          
+          echo "🎯 Analysis complete! Check Luna Analytics dashboard for results."
