@@ -267,7 +267,67 @@ function Snapshots() {
           setTestProgress(0)
           setTestMessage('')
           setTestUrl('')
-          alert(`Screenshot captured successfully! You can view it at: ${result.image_url}`)
+          
+          // Create a new window to display the screenshot
+          const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes')
+          if (newWindow) {
+            newWindow.document.write(`
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <title>Screenshot Preview</title>
+                  <style>
+                    body { 
+                      margin: 0; 
+                      padding: 20px; 
+                      font-family: system-ui, -apple-system, sans-serif;
+                      background: #f5f5f5;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                    }
+                    .container {
+                      background: white;
+                      border-radius: 8px;
+                      padding: 20px;
+                      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                      max-width: 100%;
+                    }
+                    img { 
+                      max-width: 100%; 
+                      height: auto; 
+                      border: 1px solid #ddd;
+                      border-radius: 4px;
+                    }
+                    h1 {
+                      color: #333;
+                      margin-top: 0;
+                      text-align: center;
+                    }
+                    .info {
+                      color: #666;
+                      font-size: 14px;
+                      text-align: center;
+                      margin-top: 10px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <h1>📷 Screenshot Preview</h1>
+                    <img src="${result.image_url}" alt="Website Screenshot" />
+                    <div class="info">
+                      Generated in ${result.capture_time}s using ${result.service_used}
+                    </div>
+                  </div>
+                </body>
+              </html>
+            `)
+            newWindow.document.close()
+          } else {
+            // Fallback if popup blocked
+            alert(`Screenshot captured successfully! View it by opening this URL in a new tab: ${result.image_url.substring(0, 100)}...`)
+          }
         }, 1500)
       } else {
         throw new Error(result.error || 'Screenshot capture failed')
