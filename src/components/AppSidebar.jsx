@@ -99,11 +99,13 @@ const menuItems = [
     url: "/quick-testing",
     icon: Zap,
   },
-  {
-    title: "Snapshots",
-    url: "/snapshots",
-    icon: Camera,
-  },
+          {
+          title: "Snapshots",
+          url: "/snapshots",
+          icon: Camera,
+          disabled: true,
+          tooltip: "Coming soon",
+        },
 ]
 
 export function AppSidebar() {
