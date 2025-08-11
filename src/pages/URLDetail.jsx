@@ -378,7 +378,7 @@ export default function URLDetail() {
   const MetricCard = ({ title, value, trend, isNumber = false, rawValue = null }) => (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardTitle className="text-base font-medium">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
