@@ -154,11 +154,10 @@ export default function Dashboard() {
       .replace(/^www\./, '')       // Remove www.
   }
 
-  // Speedometer Component
+  // Speedometer Component using shadcn Radial Chart
   const SpeedometerChart = ({ score }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
     const actualScore = score || 0
-    const percentage = Math.min(Math.max(actualScore, 0), 100)
     
     // Animate from 0 to actual score on mount/change
     useEffect(() => {
@@ -169,48 +168,51 @@ export default function Dashboard() {
       return () => clearTimeout(timer)
     }, [actualScore])
     
-    // Calculate the angle for the arc (180 degrees = π radians for semicircle)
-    const angle = (percentage / 100) * 180
-    const radius = 50
-    const centerX = 90
-    const centerY = 75
+    // Chart data for radial chart
+    const chartData = [
+      { 
+        performance: animatedScore,
+        fill: getPerformanceColor(score)
+      }
+    ]
     
-    // Start point is the leftmost point of the semicircle (same as background)
-    const startX = 20  // Same as background arc start
-    const startY = 75  // Same as background arc start
-    
-    // Calculate end point of the arc based on angle from the start
-    const endX = centerX - radius * Math.cos((angle) * Math.PI / 180)
-    const endY = centerY - radius * Math.sin((angle) * Math.PI / 180)
-    
-    // Large arc flag for SVG path
-    const largeArcFlag = angle > 180 ? 1 : 0
+    const chartConfig = {
+      performance: {
+        label: "Performance Score"
+      }
+    }
     
     return (
-      <div className="relative w-48 h-32 mx-auto">
-        {/* Background arc */}
-        <svg className="w-48 h-24" viewBox="0 0 180 90">
-          <path
-            d="M 20 75 A 50 50 0 0 1 160 75"
-            stroke="hsl(var(--muted))"
-            strokeWidth="8"
-            fill="none"
-            strokeLinecap="round"
-          />
-          {/* Colored arc based on score - only show the portion based on percentage */}
-          {percentage > 0 && (
-            <path
-              d={`M ${startX} ${startY} A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY}`}
-              stroke={getPerformanceColor(score)}
-              strokeWidth="8"
-              fill="none"
-              strokeLinecap="round"
-              className="transition-all duration-1000 ease-out"
+      <div className="mx-auto w-48 h-32">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-32"
+        >
+          <RadialBarChart
+            data={chartData}
+            startAngle={180}
+            endAngle={0}
+            innerRadius={30}
+            outerRadius={60}
+          >
+            <PolarGrid
+              gridType="circle"
+              radialLines={false}
+              stroke="none"
+              className="first:fill-muted last:fill-background"
+              polarRadius={[32, 58]}
             />
-          )}
-        </svg>
+            <RadialBar
+              dataKey="performance"
+              background
+              cornerRadius={10}
+            />
+            <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+            <PolarRadiusAxis tick={false} domain={[0, 100]} angle={90} />
+          </RadialBarChart>
+        </ChartContainer>
         
-        {/* Score text */}
+        {/* Score text overlay */}
         <div className="absolute inset-0 flex items-end justify-center pb-1">
           <div className="text-center">
             <NumberFlow 
