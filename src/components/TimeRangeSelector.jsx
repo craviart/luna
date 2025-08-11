@@ -1,4 +1,3 @@
-import { CalendarDays } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -15,20 +14,17 @@ const timeRanges = [
 
 export function TimeRangeSelector({ value = "7d", onValueChange, className = "" }) {
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <CalendarDays className="h-4 w-4 text-muted-foreground" />
-      <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Select range" />
-        </SelectTrigger>
-        <SelectContent align="end">
-          {timeRanges.map((range) => (
-            <SelectItem key={range.value} value={range.value}>
-              {range.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-[140px]">
+        <SelectValue placeholder="Select range" />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {timeRanges.map((range) => (
+          <SelectItem key={range.value} value={range.value}>
+            {range.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
