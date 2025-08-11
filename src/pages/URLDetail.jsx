@@ -643,7 +643,7 @@ export default function URLDetail() {
                   href={url.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline break-all flex items-center"
+                  className="text-muted-foreground hover:text-foreground hover:underline break-all flex items-center"
                 >
                   <ExternalLink className="h-4 w-4 mr-1" />
                   {cleanUrl(url.url)}
