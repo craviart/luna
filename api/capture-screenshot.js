@@ -41,33 +41,48 @@ export default async function handler(req, res) {
     
     // Try AbstractAPI for real screenshots (if API key provided)
     const apiKey = process.env.ABSTRACT_API_KEY
-    console.log('🔍 API Key check:', apiKey ? `present (${apiKey.substring(0, 8)}...)` : 'missing')
+    console.log('🔍 Environment variables check:')
+    console.log('  - ABSTRACT_API_KEY:', apiKey ? `present (${apiKey.substring(0, 8)}...)` : 'missing')
+    console.log('  - NODE_ENV:', process.env.NODE_ENV)
+    console.log('  - VERCEL:', process.env.VERCEL)
+    console.log('  - All env keys:', Object.keys(process.env).filter(k => k.includes('ABSTRACT')))
     
     if (apiKey) {
       try {
         console.log('🔄 Attempting real screenshot with AbstractAPI...')
         
-        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}&capture_full_page=true&image_quality=high&export_format=png&delay=3`
+        // Test with a simpler request first
+        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}`
         console.log('📡 AbstractAPI URL:', abstractUrl.replace(apiKey, 'HIDDEN_KEY'))
         
+        console.log('🌐 Making fetch request...')
         const response = await fetch(abstractUrl, {
           method: 'GET',
           headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
+            'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)',
+            'Accept': 'image/png,image/*'
           }
         })
         
-        console.log('📡 AbstractAPI response:', response.status, response.statusText)
-        console.log('📡 Content-Type:', response.headers.get('content-type'))
-        console.log('📡 Response headers:', Object.fromEntries(response.headers))
+        console.log('📡 AbstractAPI response received:')
+        console.log('  - Status:', response.status, response.statusText)
+        console.log('  - Content-Type:', response.headers.get('content-type'))
+        console.log('  - Content-Length:', response.headers.get('content-length'))
+        console.log('  - All headers:', Object.fromEntries(response.headers))
         
-        if (response.ok && response.headers.get('content-type')?.includes('image')) {
+        // Always read the response body to see what we get
+        const responseBody = await response.arrayBuffer()
+        console.log('📏 Response body size:', responseBody.byteLength, 'bytes')
+        
+        // Check if it's actually an image
+        const contentType = response.headers.get('content-type') || ''
+        console.log('🔍 Content type analysis:', contentType)
+        
+        if (response.ok && (contentType.includes('image') || responseBody.byteLength > 1000)) {
           console.log('✅ Real screenshot captured with AbstractAPI!')
-          const imageBuffer = await response.arrayBuffer()
-          console.log('📏 Image size:', imageBuffer.byteLength, 'bytes')
           
           // Convert image to base64 and embed in SVG
-          const base64Image = Buffer.from(imageBuffer).toString('base64')
+          const base64Image = Buffer.from(responseBody).toString('base64')
           console.log('🔄 Base64 conversion complete, length:', base64Image.length)
           
           svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
@@ -84,18 +99,20 @@ export default async function handler(req, res) {
 </svg>`
           serviceUsed = 'AbstractAPI'
         } else {
-          const errorText = await response.text()
-          console.log(`⚠️ AbstractAPI failed: ${response.status} - ${errorText}`)
-          console.log('⚠️ Full response details:', {
-            status: response.status,
-            statusText: response.statusText,
-            headers: Object.fromEntries(response.headers),
-            body: errorText
-          })
-          throw new Error(`AbstractAPI failed: ${response.status} - ${errorText}`)
+          // Convert response to text to see the error
+          const errorText = Buffer.from(responseBody).toString('utf8')
+          console.log('⚠️ AbstractAPI failed:')
+          console.log('  - Status:', response.status, response.statusText)
+          console.log('  - Error body (first 500 chars):', errorText.substring(0, 500))
+          console.log('  - Response type:', typeof errorText)
+          
+          throw new Error(`AbstractAPI failed: ${response.status} - ${errorText.substring(0, 100)}`)
         }
       } catch (error) {
-        console.log('⚠️ AbstractAPI error:', error.message)
+        console.log('⚠️ AbstractAPI error details:')
+        console.log('  - Error type:', error.constructor.name)
+        console.log('  - Error message:', error.message)
+        console.log('  - Error stack:', error.stack)
         // Continue to fallback
       }
     } else {
