@@ -14,6 +14,7 @@ import URLsPage from './pages/URLsPage'
 import URLDetail from './pages/URLDetail'
 import QuickTesting from './pages/QuickTesting'
 import QuickTestResult from './pages/QuickTestResult'
+import Snapshots from './pages/Snapshots'
 
 // Luna taglines for the dashboard
 const lunaTaglines = [
@@ -141,6 +142,12 @@ const getPageInfo = (pathname) => {
         icon: Zap,
         isDashboard: false
       }
+    case '/snapshots':
+      return {
+        title: 'Visual Snapshots',
+        icon: Activity,
+        isDashboard: false
+      }
 
     default:
       if (pathname.startsWith('/urls/') && pathname.endsWith('/results')) {
@@ -205,6 +212,7 @@ function AuthenticatedApp() {
             <Route path="/urls/:id/results" element={<URLDetail />} />
             <Route path="/quick-testing" element={<QuickTesting />} />
             <Route path="/quick-testing/:id/results" element={<QuickTestResult />} />
+            <Route path="/snapshots" element={<Snapshots />} />
           </Routes>
         </div>
       </SidebarInset>

@@ -90,12 +90,48 @@ export default async function handler(req, res) {
         if (analysisResult.success) {
           console.log(`✅ Successfully analyzed: ${url.url}`)
           successCount++
-          results.push({
-            url_id: url.id,
-            url: url.url,
-            status: 'success',
-            message: 'Analysis completed successfully'
-          })
+          
+          // Also capture screenshot if analysis was successful
+          try {
+            console.log(`📸 Capturing screenshot for: ${url.url}`)
+            const screenshotResponse = await fetch(`${req.headers.host?.includes('localhost') ? 'http://localhost:3000' : `https://${req.headers.host}`}/api/capture-screenshot`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                url: url.url,
+                urlId: url.id
+              })
+            })
+
+            const screenshotResult = await screenshotResponse.json()
+            if (screenshotResult.success) {
+              console.log(`📷 Screenshot captured for: ${url.url}`)
+              results.push({
+                url_id: url.id,
+                url: url.url,
+                status: 'success',
+                message: 'Analysis and screenshot completed successfully'
+              })
+            } else {
+              console.log(`⚠️ Screenshot failed for ${url.url}, but analysis succeeded`)
+              results.push({
+                url_id: url.id,
+                url: url.url,
+                status: 'success',
+                message: 'Analysis completed successfully (screenshot failed)'
+              })
+            }
+          } catch (screenshotError) {
+            console.log(`⚠️ Screenshot error for ${url.url}:`, screenshotError.message)
+            results.push({
+              url_id: url.id,
+              url: url.url,
+              status: 'success',
+              message: 'Analysis completed successfully (screenshot failed)'
+            })
+          }
         } else {
           console.error(`❌ Failed to analyze: ${url.url}`, analysisResult.message)
           errorCount++

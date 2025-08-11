@@ -103,8 +103,6 @@ const menuItems = [
     title: "Snapshots",
     url: "/snapshots",
     icon: Camera,
-    disabled: true,
-    tooltip: "Coming soon"
   },
 ]
 
