@@ -47,45 +47,64 @@ export default async function handler(req, res) {
     console.log('  - VERCEL:', process.env.VERCEL)
     console.log('  - All env keys:', Object.keys(process.env).filter(k => k.includes('ABSTRACT')))
     
+    // Try multiple screenshot services for reliability
+    const screenshotServices = []
+    
+    // Add AbstractAPI if key is available
     if (apiKey) {
+      screenshotServices.push({
+        name: 'AbstractAPI',
+        url: `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)',
+          'Accept': 'image/png,image/*'
+        }
+      })
+    }
+    
+    // Add free/public services as fallbacks
+    screenshotServices.push(
+      {
+        name: 'ScreenshotAPI.net (free)',
+        url: `https://shot.screenshotapi.net/screenshot?token=&url=${encodeURIComponent(validUrl)}&width=1200&height=800&output=image&file_type=png&wait_for_event=load`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
+        }
+      },
+      {
+        name: 'API Flash (demo)',
+        url: `https://api.apiflash.com/v1/urltoimage?access_key=&url=${encodeURIComponent(validUrl)}&format=png&width=1200&height=800`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
+        }
+      }
+    )
+    
+    // Try each service in order
+    for (const service of screenshotServices) {
       try {
-        console.log('🔄 Attempting real screenshot with AbstractAPI...')
+        console.log(`🔄 Attempting screenshot with ${service.name}...`)
+        console.log('📡 URL:', service.url.replace(apiKey || '', 'HIDDEN_KEY'))
         
-        // Test with a simpler request first
-        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}`
-        console.log('📡 AbstractAPI URL:', abstractUrl.replace(apiKey, 'HIDDEN_KEY'))
-        
-        console.log('🌐 Making fetch request...')
-        const response = await fetch(abstractUrl, {
+        const response = await fetch(service.url, {
           method: 'GET',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)',
-            'Accept': 'image/png,image/*'
-          }
+          headers: service.headers
         })
         
-        console.log('📡 AbstractAPI response received:')
-        console.log('  - Status:', response.status, response.statusText)
+        console.log(`📡 ${service.name} response:`, response.status, response.statusText)
         console.log('  - Content-Type:', response.headers.get('content-type'))
-        console.log('  - Content-Length:', response.headers.get('content-length'))
-        console.log('  - All headers:', Object.fromEntries(response.headers))
         
-        // Always read the response body to see what we get
-        const responseBody = await response.arrayBuffer()
-        console.log('📏 Response body size:', responseBody.byteLength, 'bytes')
-        
-        // Check if it's actually an image
-        const contentType = response.headers.get('content-type') || ''
-        console.log('🔍 Content type analysis:', contentType)
-        
-        if (response.ok && (contentType.includes('image') || responseBody.byteLength > 1000)) {
-          console.log('✅ Real screenshot captured with AbstractAPI!')
+        if (response.ok) {
+          const contentType = response.headers.get('content-type') || ''
           
-          // Convert image to base64 and embed in SVG
-          const base64Image = Buffer.from(responseBody).toString('base64')
-          console.log('🔄 Base64 conversion complete, length:', base64Image.length)
-          
-          svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+          if (contentType.includes('image')) {
+            console.log(`✅ Real screenshot captured with ${service.name}!`)
+            const imageBuffer = await response.arrayBuffer()
+            console.log('📏 Image size:', imageBuffer.byteLength, 'bytes')
+            
+            const base64Image = Buffer.from(imageBuffer).toString('base64')
+            
+            svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
   <!-- Browser Chrome -->
   <rect x="0" y="0" width="100%" height="50" fill="#f5f5f5" stroke="#ddd"/>
   <circle cx="15" cy="25" r="5" fill="#ff5f57"/>
@@ -97,26 +116,20 @@ export default async function handler(req, res) {
   <!-- Real Website Screenshot -->
   <image x="0" y="50" width="1200" height="750" href="data:image/png;base64,${base64Image}" preserveAspectRatio="xMidYMid slice"/>
 </svg>`
-          serviceUsed = 'AbstractAPI'
-        } else {
-          // Convert response to text to see the error
-          const errorText = Buffer.from(responseBody).toString('utf8')
-          console.log('⚠️ AbstractAPI failed:')
-          console.log('  - Status:', response.status, response.statusText)
-          console.log('  - Error body (first 500 chars):', errorText.substring(0, 500))
-          console.log('  - Response type:', typeof errorText)
-          
-          throw new Error(`AbstractAPI failed: ${response.status} - ${errorText.substring(0, 100)}`)
+            serviceUsed = service.name
+            break // Success! Stop trying other services
+          }
         }
+        
+        console.log(`⚠️ ${service.name} failed: ${response.status} - continuing to next service`)
+        
       } catch (error) {
-        console.log('⚠️ AbstractAPI error details:')
-        console.log('  - Error type:', error.constructor.name)
-        console.log('  - Error message:', error.message)
-        console.log('  - Error stack:', error.stack)
-        // Continue to fallback
+        console.log(`⚠️ ${service.name} error: ${error.message} - continuing to next service`)
       }
-    } else {
-      console.log('ℹ️ No AbstractAPI key provided, using template')
+    }
+    
+    if (!svgContent) {
+      console.log('ℹ️ All screenshot services failed or unavailable, using template')
     }
     
     // Fallback to enhanced template if real screenshot failed
