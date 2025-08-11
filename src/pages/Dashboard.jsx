@@ -37,6 +37,7 @@ import {
   PolarRadiusAxis
 } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
+import { TimeRangeSelector } from '../components/TimeRangeSelector'
 
 export default function Dashboard() {
   const [monitoredUrls, setMonitoredUrls] = useState([])
@@ -48,10 +49,36 @@ export default function Dashboard() {
     performance: []
   })
   const [loading, setLoading] = useState(true)
+  const [timeRange, setTimeRange] = useState('7d')
+
+  // Helper function to get date range based on selected time range
+  const getDateRange = () => {
+    const now = new Date()
+    const start = new Date()
+    
+    switch (timeRange) {
+      case '7d':
+        start.setDate(now.getDate() - 7)
+        break
+      case '30d':
+        start.setDate(now.getDate() - 30)
+        break
+      case '3m':
+        start.setMonth(now.getMonth() - 3)
+        break
+      default:
+        start.setDate(now.getDate() - 7)
+    }
+    
+    return {
+      start: start.toISOString(),
+      end: now.toISOString()
+    }
+  }
 
   useEffect(() => {
     loadDashboardData()
-  }, [])
+  }, [timeRange])
 
   const formatBytes = (bytes) => {
     if (!bytes || bytes === 0) return '0 B'
@@ -261,6 +288,7 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true)
+      const { start, end } = getDateRange()
       
       // Get monitored URLs with their latest analysis (only those that should show on dashboard)
       // Order by display_order to match the URLs page order (top-to-bottom → left-to-right)
@@ -327,6 +355,8 @@ export default function Dashboard() {
         const { data: basicAnalyses, error: analysesError } = await supabase
           .from('analysis_results')
           .select('id, url_id, performance_score, fcp_time, lcp_time, created_at')
+          .gte('created_at', start)
+          .lte('created_at', end)
           .order('created_at', { ascending: false })
           .limit(15)
         
@@ -369,6 +399,8 @@ export default function Dashboard() {
         const { data: basicQuickTests, error: quickTestsError } = await supabase
           .from('quick_tests')
           .select('id, url, performance_score, fcp_time, lcp_time, created_at')
+          .gte('created_at', start)
+          .lte('created_at', end)
           .order('created_at', { ascending: false })
           .limit(15)
         
@@ -403,10 +435,7 @@ export default function Dashboard() {
       console.log('Dashboard: Sample analysis:', combinedAnalyses[0])
       console.log('Dashboard: All analyses display_url:', combinedAnalyses.map(a => ({ type: a.type, display_url: a.display_url, url_id: a.url_id })))
 
-      // Get historical data for charts (last 30 days)
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      
+      // Get historical data for charts using selected time range
       const { data: chartAnalyses, error: chartError } = await supabase
         .from('analysis_results')
         .select(`
@@ -416,7 +445,8 @@ export default function Dashboard() {
           performance_score,
           urls!inner(id, name, url, show_on_dashboard)
         `)
-        .gte('created_at', thirtyDaysAgo.toISOString())
+        .gte('created_at', start)
+        .lte('created_at', end)
         .eq('urls.show_on_dashboard', true)
         .order('created_at', { ascending: true })
       
@@ -451,8 +481,20 @@ export default function Dashboard() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="max-w-7xl mx-auto w-full">
-
-
+        
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Performance overview and monitoring insights
+            </p>
+          </div>
+          <TimeRangeSelector 
+            value={timeRange} 
+            onValueChange={setTimeRange}
+          />
+        </div>
 
         {/* Monitored Websites Cards */}
         {monitoredUrls.length > 0 && (
