@@ -49,7 +49,7 @@ function Snapshots() {
       const { data: urlsData, error } = await supabase
         .from('urls')
         .select('*')
-        .order('dashboard_order', { ascending: true })
+        .order('created_at', { ascending: false })
 
       if (error) throw error
       setUrls(urlsData || [])
