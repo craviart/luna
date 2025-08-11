@@ -15,6 +15,7 @@ import URLDetail from './pages/URLDetail'
 import QuickTesting from './pages/QuickTesting'
 import QuickTestResult from './pages/QuickTestResult'
 import Snapshots from './pages/Snapshots'
+import ScreenshotTimeline from './pages/ScreenshotTimeline'
 
 // Luna taglines for the dashboard
 const lunaTaglines = [
@@ -150,6 +151,13 @@ const getPageInfo = (pathname) => {
       }
 
     default:
+      if (pathname.startsWith('/snapshots/') && pathname.endsWith('/timeline')) {
+        return {
+          title: 'Screenshot Timeline',
+          icon: Activity,
+          isDashboard: false
+        }
+      }
       if (pathname.startsWith('/urls/') && pathname.endsWith('/results')) {
         return {
           title: 'URL Results',
@@ -213,6 +221,7 @@ function AuthenticatedApp() {
             <Route path="/quick-testing" element={<QuickTesting />} />
             <Route path="/quick-testing/:id/results" element={<QuickTestResult />} />
             <Route path="/snapshots" element={<Snapshots />} />
+            <Route path="/snapshots/:id/timeline" element={<ScreenshotTimeline />} />
           </Routes>
         </div>
       </SidebarInset>

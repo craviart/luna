@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
@@ -488,9 +489,11 @@ function Snapshots() {
                       )}
                     </div>
                     {latestScreenshot && (
-                      <Button size="sm" variant="ghost" className="text-xs">
-                        View Timeline
-                      </Button>
+                      <Link to={`/snapshots/${url.id}/timeline`}>
+                        <Button size="sm" variant="ghost" className="text-xs">
+                          View Timeline
+                        </Button>
+                      </Link>
                     )}
                   </div>
                 </CardContent>
