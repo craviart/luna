@@ -198,44 +198,63 @@ function Snapshots() {
     setTestProgress(0)
     setTestMessage('Preparing screenshot capture...')
 
-    // Simulate progress steps
-    const steps = [
-      { progress: 25, message: 'Launching browser...' },
-      { progress: 50, message: 'Loading webpage...' },
-      { progress: 75, message: 'Capturing screenshot...' },
-      { progress: 90, message: 'Uploading to storage...' },
-      { progress: 100, message: 'Screenshot saved!' }
-    ]
-
     try {
-      let stepIndex = 0
-      const progressInterval = setInterval(() => {
-        if (stepIndex < steps.length) {
-          setTestProgress(steps[stepIndex].progress)
-          setTestMessage(steps[stepIndex].message)
-          stepIndex++
-        } else {
-          clearInterval(progressInterval)
-        }
-      }, 800)
-
       // Call screenshot API or mock in development
       let result
       if (isDevelopment()) {
         console.log('🧪 Using mock screenshot API for local development')
-        clearInterval(progressInterval)
+        
+        // Simulate progress for mock
+        const steps = [
+          { progress: 25, message: 'Launching browser...' },
+          { progress: 50, message: 'Loading webpage...' },
+          { progress: 75, message: 'Capturing screenshot...' },
+          { progress: 90, message: 'Uploading to storage...' }
+        ]
+
+        for (const step of steps) {
+          setTestProgress(step.progress)
+          setTestMessage(step.message)
+          await new Promise(resolve => setTimeout(resolve, 400))
+        }
+        
         result = await mockCaptureScreenshot(validation.url, 'test-' + Date.now())
       } else {
-        const response = await fetch('/api/capture-screenshot', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            url: validation.url,
-            urlId: 'test-' + Date.now() // Use a test ID
+        // Production: show progress while making API call
+        setTestProgress(25)
+        setTestMessage('Sending request to screenshot service...')
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+        
+        try {
+          const response = await fetch('/api/capture-screenshot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              url: validation.url,
+              urlId: 'test-' + Date.now()
+            }),
+            signal: controller.signal
           })
-        })
-        clearInterval(progressInterval)
-        result = await response.json()
+          
+          clearTimeout(timeoutId)
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          }
+          
+          setTestProgress(75)
+          setTestMessage('Processing response...')
+          
+          result = await response.json()
+        } catch (fetchError) {
+          clearTimeout(timeoutId)
+          if (fetchError.name === 'AbortError') {
+            throw new Error('Request timed out after 30 seconds')
+          }
+          throw fetchError
+        }
       }
 
       if (result.success) {
@@ -249,7 +268,7 @@ function Snapshots() {
           setTestMessage('')
           setTestUrl('')
           alert(`Screenshot captured successfully! You can view it at: ${result.image_url}`)
-        }, 2000)
+        }, 1500)
       } else {
         throw new Error(result.error || 'Screenshot capture failed')
       }
