@@ -65,6 +65,14 @@ export default async function handler(req, res) {
     // Add free/public services as fallbacks
     screenshotServices.push(
       {
+        name: 'htmlcsstoimage.com (free)',
+        url: `https://hcti.io/v1/image?url=${encodeURIComponent(validUrl)}&device_scale_factor=1&format=png&viewport_width=1200&viewport_height=800`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)',
+          'Accept': 'image/png,image/*'
+        }
+      },
+      {
         name: 'ScreenshotAPI.net (free)',
         url: `https://shot.screenshotapi.net/screenshot?token=&url=${encodeURIComponent(validUrl)}&width=1200&height=800&output=image&file_type=png&wait_for_event=load`,
         headers: {
@@ -72,8 +80,8 @@ export default async function handler(req, res) {
         }
       },
       {
-        name: 'API Flash (demo)',
-        url: `https://api.apiflash.com/v1/urltoimage?access_key=&url=${encodeURIComponent(validUrl)}&format=png&width=1200&height=800`,
+        name: 'Screamshot.com (free)',
+        url: `https://screamshot.com/api/capture?url=${encodeURIComponent(validUrl)}&width=1200&height=800&format=png`,
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
         }
