@@ -153,15 +153,20 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Screenshot capture error:', error)
+    console.error('Error stack:', error.stack)
     
     if (browser) {
       await browser.close().catch(console.error)
     }
 
+    // Provide detailed error information for debugging
     return res.status(500).json({
       success: false,
       error: 'Failed to capture screenshot',
-      details: error.message
+      details: error.message,
+      stack: error.stack,
+      isProduction: process.env.NODE_ENV === 'production',
+      nodeEnv: process.env.NODE_ENV
     })
   }
 }
