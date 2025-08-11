@@ -438,7 +438,7 @@ export default function URLsPage() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Daily analysis at 9am UTC • All monitored pages enabled
+              Analysis 3x daily (6am, 2pm, 10pm UTC) • All monitored pages enabled
             </p>
           </div>
           <div className="mt-6 sm:mt-0 flex gap-3">
