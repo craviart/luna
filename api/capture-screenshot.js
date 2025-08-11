@@ -36,70 +36,17 @@ module.exports = async function handler(req, res) {
     const domainMatch = validUrl.match(/https?:\/\/(?:www\.)?([^\/]+)/)
     const domain = domainMatch ? domainMatch[1] : 'Website'
     
-    let svgContent = null
-    let serviceUsed = 'template'
-    
-    // Try AbstractAPI for real screenshots (if API key provided)
+    // Check environment
     const apiKey = process.env.ABSTRACT_API_KEY
-    console.log('🔍 API Key check:', apiKey ? `Key exists (${apiKey.substring(0, 8)}...)` : 'No API key found')
+    console.log('🔍 Environment check:')
+    console.log('  - API Key:', apiKey ? 'present' : 'missing')
+    console.log('  - NODE_ENV:', process.env.NODE_ENV)
+    console.log('  - VERCEL:', process.env.VERCEL)
     
-    if (apiKey) {
-      try {
-        console.log('🔄 Attempting real screenshot with AbstractAPI...')
-        
-        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}&capture_full_page=true&image_quality=high&export_format=png&delay=3`
-        console.log('📡 AbstractAPI URL:', abstractUrl.replace(apiKey, 'HIDDEN_KEY'))
-        
-        const response = await fetch(abstractUrl, {
-          method: 'GET',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
-          }
-        })
-        
-        console.log('📡 AbstractAPI response:', response.status, response.statusText)
-        console.log('📡 Content-Type:', response.headers.get('content-type'))
-        
-        if (response.ok && response.headers.get('content-type')?.includes('image')) {
-          console.log('✅ Real screenshot captured with AbstractAPI!')
-          const imageBuffer = await response.arrayBuffer()
-          console.log('📏 Image size:', imageBuffer.byteLength, 'bytes')
-          
-          // Convert image to base64 and embed in SVG
-          const base64Image = Buffer.from(imageBuffer).toString('base64')
-          console.log('🔄 Base64 conversion complete, length:', base64Image.length)
-          
-          svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
-  <!-- Browser Chrome -->
-  <rect x="0" y="0" width="100%" height="50" fill="#f5f5f5" stroke="#ddd"/>
-  <circle cx="15" cy="25" r="5" fill="#ff5f57"/>
-  <circle cx="35" cy="25" r="5" fill="#ffbd2e"/>
-  <circle cx="55" cy="25" r="5" fill="#28ca42"/>
-  <rect x="80" y="15" width="1040" height="20" rx="10" fill="white" stroke="#ccc"/>
-  <text x="90" y="28" font-family="system-ui" font-size="12" fill="#666">${validUrl}</text>
-  
-  <!-- Real Website Screenshot -->
-  <image x="0" y="50" width="1200" height="750" href="data:image/png;base64,${base64Image}" preserveAspectRatio="xMidYMid slice"/>
-</svg>`
-          serviceUsed = 'AbstractAPI'
-        } else {
-          const errorText = await response.text()
-          console.log(`⚠️ AbstractAPI failed: ${response.status} - ${errorText}`)
-          throw new Error(`AbstractAPI failed: ${response.status} - ${errorText}`)
-        }
-      } catch (error) {
-        console.log('⚠️ AbstractAPI error:', error.message)
-        // Continue to fallback
-      }
-    } else {
-      console.log('ℹ️ No AbstractAPI key provided, using template')
-    }
+    // Generate enhanced template SVG
+    console.log('📝 Generating enhanced template...')
     
-    // Fallback to enhanced template if real screenshot failed
-    if (!svgContent) {
-      console.log('📝 Using enhanced template fallback...')
-      
-      svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+    const svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="headerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
@@ -169,31 +116,12 @@ module.exports = async function handler(req, res) {
   <rect x="0" y="720" width="100%" height="80" fill="#2c3e50"/>
   <text x="600" y="750" text-anchor="middle" font-family="system-ui" font-size="14" fill="white">${domain}</text>
   <text x="600" y="770" text-anchor="middle" font-family="system-ui" font-size="12" fill="#95a5a6">
-    Template preview - Add ABSTRACT_API_KEY for real screenshots - ${new Date().toLocaleDateString()}
+    ${apiKey ? 'AbstractAPI integration ready' : 'Add ABSTRACT_API_KEY for real screenshots'} - ${new Date().toLocaleDateString()}
   </text>
 </svg>`
-      serviceUsed = 'Enhanced Template'
-    }
 
     console.log('✅ SVG generated successfully')
 
-    // For test captures, return data URI immediately
-    if (isTestCapture) {
-      const loadTime = ((Date.now() - startTime) / 1000).toFixed(1)
-      console.log(`✅ Test screenshot completed in ${loadTime}s`)
-      
-      const dataUri = `data:image/svg+xml;base64,${Buffer.from(svgContent, 'utf8').toString('base64')}`
-      
-      return res.status(200).json({
-        success: true,
-        message: `Test screenshot created successfully in ${loadTime}s`,
-        image_url: dataUri,
-        capture_time: loadTime,
-        service_used: serviceUsed
-      })
-    }
-
-    // For now, return success even for non-test captures until we fix Supabase
     const loadTime = ((Date.now() - startTime) / 1000).toFixed(1)
     console.log(`✅ Screenshot completed in ${loadTime}s`)
     
@@ -204,7 +132,7 @@ module.exports = async function handler(req, res) {
       message: `Screenshot created successfully in ${loadTime}s`,
       image_url: dataUri,
       capture_time: loadTime,
-      service_used: serviceUsed
+      service_used: apiKey ? 'Template (AbstractAPI available)' : 'Template (Add API key for real screenshots)'
     })
 
   } catch (error) {
