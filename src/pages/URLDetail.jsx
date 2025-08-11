@@ -595,6 +595,31 @@ export default function URLDetail() {
 
   const latestAnalysis = analyses[0]
   const successfulAnalyses = analyses.filter(a => a.success)
+  
+  // Calculate percentage changes from previous analysis
+  const calculatePercentageChange = (current, previous) => {
+    if (!current || !previous || previous === 0) return null
+    return ((current - previous) / previous) * 100
+  }
+  
+  // Get trends for metrics (comparing latest vs second latest successful analysis)
+  const getMetricTrends = () => {
+    if (successfulAnalyses.length < 2) return {}
+    
+    const latest = successfulAnalyses[0]
+    const previous = successfulAnalyses[1]
+    
+    return {
+      // For performance score: higher is better, so positive change is good
+      performanceScore: calculatePercentageChange(latest.performance_score, previous.performance_score),
+      // For timing metrics: lower is better, so we invert the trend (negative change is good)
+      fcpTime: calculatePercentageChange(latest.fcp_time, previous.fcp_time) * -1,
+      lcpTime: calculatePercentageChange(latest.lcp_time, previous.lcp_time) * -1,
+      tbtTime: calculatePercentageChange(latest.total_blocking_time, previous.total_blocking_time) * -1
+    }
+  }
+  
+  const trends = getMetricTrends()
 
   return (
     <div className="min-h-screen bg-background">
@@ -910,6 +935,7 @@ export default function URLDetail() {
                 value={`${latestAnalysis.performance_score || 0}/100`}
                 subtitle="Core Web Vitals based"
                 icon={Zap}
+                trend={trends.performanceScore}
                 isNumber={true}
                 rawValue={latestAnalysis.performance_score || 0}
               />
@@ -918,6 +944,7 @@ export default function URLDetail() {
                 value={formatTime(latestAnalysis.fcp_time)}
                 subtitle="Loading speed"
                 icon={Target}
+                trend={trends.fcpTime}
                 color={getFCPColor(latestAnalysis.fcp_time)}
               />
               <MetricCard
@@ -925,6 +952,7 @@ export default function URLDetail() {
                 value={formatTime(latestAnalysis.lcp_time)}
                 subtitle="Main content"
                 icon={FileText}
+                trend={trends.lcpTime}
                 color={getLCPColor(latestAnalysis.lcp_time)}
               />
               <MetricCard
@@ -932,6 +960,7 @@ export default function URLDetail() {
                 value={formatTime(latestAnalysis.total_blocking_time)}
                 subtitle="Interactivity"
                 icon={Users}
+                trend={trends.tbtTime}
                 color={getTBTColor(latestAnalysis.total_blocking_time)}
               />
             </div>
