@@ -117,52 +117,28 @@ export default async function handler(req, res) {
     }
 
     const loadTime = Math.round(Date.now() - startTime) // Ensure integer
-
-
-
-    // Build result object
-    const result = {
-      url: url,
-      loadTime: loadTime,
-      success: true,
-      timestamp: new Date().toISOString(),
-      performance_metrics: {
-        performance_score: performanceScore,
-        fcp_time: fcpTime,
-        lcp_time: lcpTime,
-        speed_index: speedIndexTime,
-        total_blocking_time: tbtTime,
-        cumulative_layout_shift: clsValue
-      },
-      lighthouse_data: performanceData ? {
-        performance_score: performanceScore,
-        fcp_time: fcpTime,
-        lcp_time: lcpTime,
-        speed_index: speedIndexTime,
-        total_blocking_time: tbtTime,
-        cumulative_layout_shift: clsValue,
-        // Removed full_report to improve performance - only store essential metrics
-        summary: {
-          url: performanceData.lighthouseResult?.finalUrl || url,
-          lighthouse_version: performanceData.lighthouseResult?.lighthouseVersion,
-          request_time: performanceData.analysisUTCTimestamp
-        }
-      } : null,
-      // Removed heavy raw_data object for better performance
-      metadata: {
-        analysisTime: loadTime,
-        timestamp: new Date().toISOString()
-      }
-    }
+    console.log('Analysis completed in:', loadTime, 'ms')
 
     // Save to database (unified approach for both monitored URLs and quick tests)
     if (isQuickTest) {
       console.log('Saving quick test result to database...')
       
-      // Ensure all values have proper defaults to prevent database errors
+      // Minimal data for quick tests - only store essential metrics
       const insertData = {
         url: url,
-        analysis_result: result,
+        analysis_result: {
+          url: url,
+          success: true,
+          timestamp: new Date().toISOString(),
+          performance_metrics: {
+            performance_score: performanceScore || 0,
+            fcp_time: fcpTime || 0,
+            lcp_time: lcpTime || 0,
+            speed_index: speedIndexTime || 0,
+            total_blocking_time: tbtTime || 0,
+            cumulative_layout_shift: clsValue || 0.0
+          }
+        },
         performance_score: performanceScore || 0,
         fcp_time: fcpTime || 0,
         lcp_time: lcpTime || 0,
@@ -191,13 +167,13 @@ export default async function handler(req, res) {
           url_id: urlId,
           url: url,
           load_time: loadTime,
-          performance_score: performanceScore,
-          fcp_time: fcpTime,
-          lcp_time: lcpTime,
-          speed_index: speedIndexTime,
-          total_blocking_time: tbtTime,
-          cumulative_layout_shift: clsValue,
-          lighthouse_data: result.lighthouse_data,
+          performance_score: performanceScore || 0,
+          fcp_time: fcpTime || 0,
+          lcp_time: lcpTime || 0,
+          speed_index: speedIndexTime || 0,
+          total_blocking_time: tbtTime || 0,
+          cumulative_layout_shift: clsValue || 0.0,
+          // Removed lighthouse_data completely for maximum performance
           success: true
         })
 
@@ -220,7 +196,15 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: successMessage,
-      result: result
+      performance_metrics: {
+        performance_score: performanceScore || 0,
+        fcp_time: fcpTime || 0,
+        lcp_time: lcpTime || 0,
+        speed_index: speedIndexTime || 0,
+        total_blocking_time: tbtTime || 0,
+        cumulative_layout_shift: clsValue || 0.0
+      },
+      analysis_time: loadTime
     })
 
   } catch (error) {

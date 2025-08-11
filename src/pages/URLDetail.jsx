@@ -195,7 +195,7 @@ export default function URLDetail() {
       setProgressMessage('Analysis complete!')
       await new Promise(resolve => setTimeout(resolve, 200))
 
-      if (result.success && result.result) {
+      if (result.success) {
         // The API already saves to database, so we just need to reload
         setProgress(100)
         setProgressMessage('Analysis complete!')

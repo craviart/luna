@@ -232,7 +232,7 @@ export default function QuickTesting() {
       setProgressMessage('Saving results to database...')
       await new Promise(resolve => setTimeout(resolve, 300))
 
-      if (result.success && result.result) {
+      if (result.success) {
         // The API handles database saving, consistent with monitored URLs
         setProgress(100)
         setProgressMessage('Analysis complete!')
@@ -240,7 +240,7 @@ export default function QuickTesting() {
         await new Promise(resolve => setTimeout(resolve, 500))
         
         toast.success('Analysis completed successfully!', {
-          description: `Performance Score: ${result.result.performance_score || 'N/A'}/100`
+          description: `Performance Score: ${result.performance_metrics?.performance_score || 'N/A'}/100`
         })
         
         // Reset form and reload tests to show the new data
