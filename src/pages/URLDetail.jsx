@@ -65,6 +65,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
+import { TimeRangeSelector } from '../components/TimeRangeSelector'
 
 // Google PageSpeed Insights color coding for Core Web Vitals
 // Clean URL display function - remove protocol and www for cooler look
@@ -143,10 +144,36 @@ export default function URLDetail() {
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [timeRange, setTimeRange] = useState('7d')
+
+  // Helper function to get date range based on selected time range
+  const getDateRange = () => {
+    const now = new Date()
+    const start = new Date()
+    
+    switch (timeRange) {
+      case '7d':
+        start.setDate(now.getDate() - 7)
+        break
+      case '30d':
+        start.setDate(now.getDate() - 30)
+        break
+      case '3m':
+        start.setMonth(now.getMonth() - 3)
+        break
+      default:
+        start.setDate(now.getDate() - 7)
+    }
+    
+    return {
+      start: start.toISOString(),
+      end: now.toISOString()
+    }
+  }
 
   useEffect(() => {
     loadUrlAndAnalyses()
-  }, [id])
+  }, [id, timeRange])
 
   const handleAnalyze = async () => {
     if (!url) return
@@ -296,11 +323,14 @@ export default function URLDetail() {
         .eq('id', id)
         .single()
 
-      // Get analyses for this URL
+      // Get analyses for this URL with time range filtering
+      const { start, end } = getDateRange()
       const { data: analysesData, error: analysesError } = await supabase
         .from('analysis_results')
         .select('id, created_at, success, fcp_time, lcp_time, performance_score, url_id, load_time, status, title, speed_index, total_blocking_time, cumulative_layout_shift')
         .eq('url_id', id)
+        .gte('created_at', start)
+        .lte('created_at', end)
         .order('created_at', { ascending: false })
 
       if (!urlError && !analysesError) {
@@ -618,8 +648,14 @@ export default function URLDetail() {
               </div>
             </div>
             <div className="mt-4 lg:mt-0">
-              {/* Action Buttons - Delete, Edit, Run Analysis in same line */}
-              <div className="flex items-center gap-2">
+              {/* Time Range Selector and Action Buttons */}
+              <div className="flex items-center gap-4">
+                <TimeRangeSelector 
+                  value={timeRange} 
+                  onValueChange={setTimeRange}
+                />
+                {/* Action Buttons - Delete, Edit, Run Analysis in same line */}
+                <div className="flex items-center gap-2">
                 <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                   <AlertDialogTrigger asChild>
                     <Button variant="outline" size="sm">
@@ -659,6 +695,7 @@ export default function URLDetail() {
                     'Run New Analysis'
                   )}
                 </Button>
+                </div>
               </div>
             </div>
           </div>

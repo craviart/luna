@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
 import NumberFlow from '@number-flow/react'
+import { TimeRangeSelector } from '../components/TimeRangeSelector'
 
 export default function QuickTesting() {
   const [url, setUrl] = useState('')
@@ -28,6 +29,7 @@ export default function QuickTesting() {
   const [quickTests, setQuickTests] = useState([])
   const [loading, setLoading] = useState(true)
   const [deletingTestId, setDeletingTestId] = useState(null)
+  const [timeRange, setTimeRange] = useState('7d')
 
   // Utility functions
   const formatTime = (time) => {
@@ -67,16 +69,44 @@ export default function QuickTesting() {
     </Badge>
   )
 
+  // Helper function to get date range based on selected time range
+  const getDateRange = () => {
+    const now = new Date()
+    const start = new Date()
+    
+    switch (timeRange) {
+      case '7d':
+        start.setDate(now.getDate() - 7)
+        break
+      case '30d':
+        start.setDate(now.getDate() - 30)
+        break
+      case '3m':
+        start.setMonth(now.getMonth() - 3)
+        break
+      default:
+        start.setDate(now.getDate() - 7)
+    }
+    
+    return {
+      start: start.toISOString(),
+      end: now.toISOString()
+    }
+  }
+
   useEffect(() => {
     loadQuickTests()
-  }, [])
+  }, [timeRange])
 
   const loadQuickTests = async () => {
     try {
       setLoading(true)
+      const { start, end } = getDateRange()
       const { data, error } = await supabase
         .from('quick_tests')
         .select('*')
+        .gte('created_at', start)
+        .lte('created_at', end)
         .order('created_at', { ascending: false })
         .limit(20)
 
@@ -303,7 +333,17 @@ export default function QuickTesting() {
     <div className="flex flex-1 flex-col gap-4 p-4">
       <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Quick Testing</h1>
+            <p className="text-muted-foreground">
+              Run one-time performance analysis on any website
+            </p>
+          </div>
+          <TimeRangeSelector 
+            value={timeRange} 
+            onValueChange={setTimeRange}
+          />
         </div>
 
         {/* Quick Test Form */}
