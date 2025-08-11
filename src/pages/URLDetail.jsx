@@ -375,11 +375,10 @@ export default function URLDetail() {
     }
   }
 
-  const MetricCard = ({ title, value, subtitle, icon: Icon, trend, isNumber = false, rawValue = null }) => (
+  const MetricCard = ({ title, value, trend, isNumber = false, rawValue = null }) => (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
@@ -393,7 +392,6 @@ export default function URLDetail() {
             value
           )}
         </div>
-        <p className="text-xs text-muted-foreground">{subtitle}</p>
         {trend !== undefined && (
           <div className="flex items-center pt-1">
             {trend > 0 ? (
@@ -933,8 +931,6 @@ export default function URLDetail() {
               <MetricCard
                 title="Performance Score"
                 value={`${latestAnalysis.performance_score || 0}/100`}
-                subtitle="Core Web Vitals based"
-                icon={Zap}
                 trend={trends.performanceScore}
                 isNumber={true}
                 rawValue={latestAnalysis.performance_score || 0}
@@ -942,26 +938,17 @@ export default function URLDetail() {
               <MetricCard
                 title="First Contentful Paint"
                 value={formatTime(latestAnalysis.fcp_time)}
-                subtitle="Loading speed"
-                icon={Target}
                 trend={trends.fcpTime}
-                color={getFCPColor(latestAnalysis.fcp_time)}
               />
               <MetricCard
                 title="Largest Contentful Paint"
                 value={formatTime(latestAnalysis.lcp_time)}
-                subtitle="Main content"
-                icon={FileText}
                 trend={trends.lcpTime}
-                color={getLCPColor(latestAnalysis.lcp_time)}
               />
               <MetricCard
                 title="Total Blocking Time"
                 value={formatTime(latestAnalysis.total_blocking_time)}
-                subtitle="Interactivity"
-                icon={Users}
                 trend={trends.tbtTime}
-                color={getTBTColor(latestAnalysis.total_blocking_time)}
               />
             </div>
           </div>
