@@ -225,7 +225,7 @@ function Snapshots() {
         setTestMessage('Sending request to screenshot service...')
         
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
         
         try {
           const response = await fetch('/api/capture-screenshot', {
@@ -251,7 +251,7 @@ function Snapshots() {
         } catch (fetchError) {
           clearTimeout(timeoutId)
           if (fetchError.name === 'AbortError') {
-            throw new Error('Request timed out after 30 seconds')
+            throw new Error('Request timed out after 15 seconds. The screenshot service may be experiencing high load.')
           }
           throw fetchError
         }

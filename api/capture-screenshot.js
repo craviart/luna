@@ -44,8 +44,7 @@ export default async function handler(req, res) {
     })
 
     const screenshotResponse = await fetch(`${screenshotApiUrl}?${params}`, {
-      method: 'GET',
-      timeout: 30000
+      method: 'GET'
     })
 
     if (screenshotResponse.ok) {
