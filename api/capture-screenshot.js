@@ -59,6 +59,7 @@ export default async function handler(req, res) {
         
         console.log('📡 AbstractAPI response:', response.status, response.statusText)
         console.log('📡 Content-Type:', response.headers.get('content-type'))
+        console.log('📡 Response headers:', Object.fromEntries(response.headers))
         
         if (response.ok && response.headers.get('content-type')?.includes('image')) {
           console.log('✅ Real screenshot captured with AbstractAPI!')
@@ -85,6 +86,12 @@ export default async function handler(req, res) {
         } else {
           const errorText = await response.text()
           console.log(`⚠️ AbstractAPI failed: ${response.status} - ${errorText}`)
+          console.log('⚠️ Full response details:', {
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers),
+            body: errorText
+          })
           throw new Error(`AbstractAPI failed: ${response.status} - ${errorText}`)
         }
       } catch (error) {
