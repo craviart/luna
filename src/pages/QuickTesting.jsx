@@ -188,22 +188,19 @@ export default function QuickTesting() {
     setProgressMessage('Initializing analysis...')
 
     try {
-      // More granular progress steps with realistic timing
+      // Optimized progress steps - faster and more accurate  
       const progressSteps = [
-        { progress: 3, message: 'Initializing quick test environment...', delay: 300 },
-        { progress: 8, message: 'Connecting to PageSpeed Insights API...', delay: 400 },
-        { progress: 15, message: 'Requesting performance audit...', delay: 600 },
-        { progress: 22, message: 'Loading page with mobile 4G simulation...', delay: 800 },
-        { progress: 30, message: 'Capturing First Contentful Paint (FCP)...', delay: 700 },
-        { progress: 38, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 600 },
-        { progress: 45, message: 'Analyzing Speed Index metrics...', delay: 500 },
-        { progress: 52, message: 'Evaluating Total Blocking Time (TBT)...', delay: 400 },
-        { progress: 59, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 500 },
-        { progress: 67, message: 'Generating performance score...', delay: 400 },
-        { progress: 74, message: 'Simulating code coverage analysis...', delay: 600 },
-        { progress: 81, message: 'Identifying unused JavaScript...', delay: 500 },
-        { progress: 88, message: 'Calculating unused CSS resources...', delay: 400 },
-        { progress: 94, message: 'Compiling test results...', delay: 300 }
+        { progress: 5, message: 'Initializing quick test environment...', delay: 200 },
+        { progress: 12, message: 'Connecting to PageSpeed Insights API...', delay: 300 },
+        { progress: 20, message: 'Requesting performance audit...', delay: 400 },
+        { progress: 30, message: 'Loading page with mobile 4G simulation...', delay: 500 },
+        { progress: 40, message: 'Capturing First Contentful Paint (FCP)...', delay: 400 },
+        { progress: 50, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 400 },
+        { progress: 60, message: 'Analyzing Speed Index metrics...', delay: 300 },
+        { progress: 70, message: 'Evaluating Total Blocking Time (TBT)...', delay: 300 },
+        { progress: 80, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 300 },
+        { progress: 90, message: 'Generating performance score...', delay: 200 },
+        { progress: 96, message: 'Saving test results...', delay: 200 }
       ]
 
       // Execute progress steps

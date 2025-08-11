@@ -141,11 +141,17 @@ export default async function handler(req, res) {
         speed_index: speedIndexTime,
         total_blocking_time: tbtTime,
         cumulative_layout_shift: clsValue,
-        full_report: performanceData
+        // Removed full_report to improve performance - only store essential metrics
+        summary: {
+          url: performanceData.lighthouseResult?.finalUrl || url,
+          lighthouse_version: performanceData.lighthouseResult?.lighthouseVersion,
+          request_time: performanceData.analysisUTCTimestamp
+        }
       } : null,
-      raw_data: {
-        pageSpeed: performanceData,
-        analysisTime: loadTime
+      // Removed heavy raw_data object for better performance
+      metadata: {
+        analysisTime: loadTime,
+        timestamp: new Date().toISOString()
       }
     }
 
@@ -192,7 +198,6 @@ export default async function handler(req, res) {
           total_blocking_time: tbtTime,
           cumulative_layout_shift: clsValue,
           lighthouse_data: result.lighthouse_data,
-          raw_data: result.raw_data,
           success: true
         })
 

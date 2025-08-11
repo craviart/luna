@@ -156,21 +156,18 @@ export default function URLDetail() {
     setProgressMessage('Initializing analysis...')
     
     try {
-      // More granular progress steps with realistic timing
+      // Optimized progress steps - faster and more accurate
       const progressSteps = [
-        { progress: 5, message: 'Connecting to PageSpeed Insights API...', delay: 400 },
-        { progress: 12, message: 'Requesting performance audit...', delay: 600 },
-        { progress: 18, message: 'Loading page with mobile 4G simulation...', delay: 800 },
-        { progress: 25, message: 'Capturing First Contentful Paint (FCP)...', delay: 700 },
-        { progress: 32, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 600 },
-        { progress: 40, message: 'Analyzing Speed Index metrics...', delay: 500 },
-        { progress: 48, message: 'Evaluating Total Blocking Time (TBT)...', delay: 400 },
-        { progress: 55, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 500 },
-        { progress: 62, message: 'Generating performance score...', delay: 400 },
-        { progress: 70, message: 'Simulating code coverage analysis...', delay: 600 },
-        { progress: 78, message: 'Identifying unused JavaScript...', delay: 500 },
-        { progress: 85, message: 'Calculating unused CSS resources...', delay: 400 },
-        { progress: 92, message: 'Compiling analysis results...', delay: 300 }
+        { progress: 8, message: 'Connecting to PageSpeed Insights API...', delay: 300 },
+        { progress: 15, message: 'Requesting performance audit...', delay: 400 },
+        { progress: 25, message: 'Loading page with mobile 4G simulation...', delay: 500 },
+        { progress: 35, message: 'Capturing First Contentful Paint (FCP)...', delay: 400 },
+        { progress: 45, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 400 },
+        { progress: 55, message: 'Analyzing Speed Index metrics...', delay: 300 },
+        { progress: 65, message: 'Evaluating Total Blocking Time (TBT)...', delay: 300 },
+        { progress: 75, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 300 },
+        { progress: 85, message: 'Generating performance score...', delay: 200 },
+        { progress: 95, message: 'Saving results...', delay: 200 }
       ]
 
       // Execute progress steps
@@ -194,9 +191,9 @@ export default function URLDetail() {
 
       const result = await response.json()
       
-      setProgress(96)
-      setProgressMessage('Saving results to database...')
-      await new Promise(resolve => setTimeout(resolve, 300))
+      setProgress(99)
+      setProgressMessage('Analysis complete!')
+      await new Promise(resolve => setTimeout(resolve, 200))
 
       if (result.success && result.result) {
         // The API already saves to database, so we just need to reload
