@@ -80,6 +80,13 @@ export default async function handler(req, res) {
         }
       },
       {
+        name: 'ScreenshotOne (free)',
+        url: `https://api.screenshotone.com/take?access_key=&url=${encodeURIComponent(validUrl)}&viewport_width=1200&viewport_height=800&format=png`,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; LunaAnalytics/1.0)'
+        }
+      },
+      {
         name: 'Screamshot.com (free)',
         url: `https://screamshot.com/api/capture?url=${encodeURIComponent(validUrl)}&width=1200&height=800&format=png`,
         headers: {
@@ -102,17 +109,16 @@ export default async function handler(req, res) {
         console.log(`📡 ${service.name} response:`, response.status, response.statusText)
         console.log('  - Content-Type:', response.headers.get('content-type'))
         
-        if (response.ok) {
-          const contentType = response.headers.get('content-type') || ''
+        const contentType = response.headers.get('content-type') || ''
+        const responseBody = await response.arrayBuffer()
+        console.log('📏 Response body size:', responseBody.byteLength, 'bytes')
+        
+        if (response.ok && contentType.includes('image') && responseBody.byteLength > 1000) {
+          console.log(`✅ Real screenshot captured with ${service.name}!`)
           
-          if (contentType.includes('image')) {
-            console.log(`✅ Real screenshot captured with ${service.name}!`)
-            const imageBuffer = await response.arrayBuffer()
-            console.log('📏 Image size:', imageBuffer.byteLength, 'bytes')
-            
-            const base64Image = Buffer.from(imageBuffer).toString('base64')
-            
-            svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+          const base64Image = Buffer.from(responseBody).toString('base64')
+          
+          svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
   <!-- Browser Chrome -->
   <rect x="0" y="0" width="100%" height="50" fill="#f5f5f5" stroke="#ddd"/>
   <circle cx="15" cy="25" r="5" fill="#ff5f57"/>
@@ -124,9 +130,12 @@ export default async function handler(req, res) {
   <!-- Real Website Screenshot -->
   <image x="0" y="50" width="1200" height="750" href="data:image/png;base64,${base64Image}" preserveAspectRatio="xMidYMid slice"/>
 </svg>`
-            serviceUsed = service.name
-            break // Success! Stop trying other services
-          }
+          serviceUsed = service.name
+          break // Success! Stop trying other services
+        } else {
+          // Log what we actually got for debugging
+          const responseText = Buffer.from(responseBody).toString('utf8').substring(0, 200)
+          console.log(`⚠️ ${service.name} failed - Content-Type: ${contentType}, Body preview: ${responseText}`)
         }
         
         console.log(`⚠️ ${service.name} failed: ${response.status} - continuing to next service`)
