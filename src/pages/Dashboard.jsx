@@ -157,17 +157,25 @@ export default function Dashboard() {
   // Speedometer Component
   const SpeedometerChart = ({ score }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
+    const [animatedPercentage, setAnimatedPercentage] = useState(0)
     const actualScore = score || 0
     const percentage = Math.min(Math.max(actualScore, 0), 100)
     
     // Animate from 0 to actual score on mount/change
     useEffect(() => {
       setAnimatedScore(0) // Reset to 0 first
+      setAnimatedPercentage(0)
       const timer = setTimeout(() => {
         setAnimatedScore(actualScore)
+        setAnimatedPercentage(percentage)
       }, 200)
       return () => clearTimeout(timer)
-    }, [actualScore])
+    }, [actualScore, percentage])
+    
+    // Calculate path length for dash array (semicircle circumference)
+    const radius = 50
+    const circumference = Math.PI * radius // Half circle
+    const strokeLength = (animatedPercentage / 100) * circumference
     
     return (
       <div className="relative w-48 h-32 mx-auto">
@@ -180,15 +188,19 @@ export default function Dashboard() {
             fill="none"
             strokeLinecap="round"
           />
-          {/* Colored arc based on score */}
+          {/* Colored arc based on score - only show the portion based on percentage */}
           <path
             d="M 20 75 A 50 50 0 0 1 160 75"
             stroke={getPerformanceColor(score)}
             strokeWidth="8"
             fill="none"
             strokeLinecap="round"
-            strokeDasharray={`${(percentage / 100) * 157} 157`}
+            strokeDasharray={`${strokeLength} ${circumference}`}
+            strokeDashoffset="0"
             className="transition-all duration-1000 ease-out"
+            style={{
+              transformOrigin: '90px 75px',
+            }}
           />
         </svg>
         
