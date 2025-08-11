@@ -31,6 +31,10 @@ function Snapshots() {
   const [capturingProgress, setCapturingProgress] = useState(0)
   const [capturingMessage, setCapturingMessage] = useState('')
   const [selectedUrl, setSelectedUrl] = useState(null)
+  const [testUrl, setTestUrl] = useState('')
+  const [capturingTest, setCapturingTest] = useState(false)
+  const [testProgress, setTestProgress] = useState(0)
+  const [testMessage, setTestMessage] = useState('')
 
   // Fetch monitored URLs
   useEffect(() => {
@@ -134,6 +138,117 @@ function Snapshots() {
     return screenshots[urlId]?.length || 0
   }
 
+  // Validate URL utility (from QuickTesting)
+  const validateUrl = (urlString) => {
+    if (!urlString || !urlString.trim()) {
+      return { isValid: false, error: 'Please enter a URL' }
+    }
+
+    let trimmedUrl = urlString.trim()
+
+    // Add https:// if no protocol is specified
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      trimmedUrl = `https://${trimmedUrl}`
+    }
+
+    // Remove duplicate slashes (except after protocol)
+    trimmedUrl = trimmedUrl.replace(/([^:]\/)\/+/g, '$1')
+
+    // Fix www without dot
+    if (trimmedUrl.includes('://www') && !trimmedUrl.includes('://www.')) {
+      trimmedUrl = trimmedUrl.replace('://www', '://www.')
+    }
+
+    try {
+      const url = new URL(trimmedUrl)
+      
+      // Basic validation
+      if (!url.hostname || url.hostname.length < 3) {
+        return { isValid: false, error: 'Please enter a valid domain name' }
+      }
+
+      // Check for valid TLD (at least 2 characters)
+      const parts = url.hostname.split('.')
+      if (parts.length < 2 || parts[parts.length - 1].length < 2) {
+        return { isValid: false, error: 'Please enter a valid domain with a proper extension' }
+      }
+
+      return { isValid: true, url: trimmedUrl }
+    } catch (error) {
+      return { isValid: false, error: 'Please enter a valid URL format (e.g., fast.com or https://example.com)' }
+    }
+  }
+
+  const captureTestUrl = async () => {
+    const validation = validateUrl(testUrl)
+    if (!validation.isValid) {
+      alert(validation.error)
+      return
+    }
+
+    setCapturingTest(true)
+    setTestProgress(0)
+    setTestMessage('Preparing screenshot capture...')
+
+    // Simulate progress steps
+    const steps = [
+      { progress: 25, message: 'Launching browser...' },
+      { progress: 50, message: 'Loading webpage...' },
+      { progress: 75, message: 'Capturing screenshot...' },
+      { progress: 90, message: 'Uploading to storage...' },
+      { progress: 100, message: 'Screenshot saved!' }
+    ]
+
+    try {
+      let stepIndex = 0
+      const progressInterval = setInterval(() => {
+        if (stepIndex < steps.length) {
+          setTestProgress(steps[stepIndex].progress)
+          setTestMessage(steps[stepIndex].message)
+          stepIndex++
+        } else {
+          clearInterval(progressInterval)
+        }
+      }, 800)
+
+      // Call screenshot API (without urlId for test captures)
+      const response = await fetch('/api/capture-screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          url: validation.url,
+          urlId: 'test-' + Date.now() // Use a test ID
+        })
+      })
+
+      clearInterval(progressInterval)
+      const result = await response.json()
+
+      if (result.success) {
+        setTestProgress(100)
+        setTestMessage('Screenshot captured successfully!')
+        
+        // Show success and reset after delay
+        setTimeout(() => {
+          setCapturingTest(false)
+          setTestProgress(0)
+          setTestMessage('')
+          setTestUrl('')
+          alert(`Screenshot captured successfully! You can view it at: ${result.image_url}`)
+        }, 2000)
+      } else {
+        throw new Error(result.error || 'Screenshot capture failed')
+      }
+
+    } catch (error) {
+      console.error('Test screenshot error:', error)
+      setTestProgress(0)
+      setTestMessage('')
+      setCapturingTest(false)
+      alert('Failed to capture screenshot: ' + error.message)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -162,7 +277,93 @@ function Snapshots() {
         </Button>
       </div>
 
-      {/* Progress Dialog */}
+      {/* Test Any URL Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-center">Test Screenshot Capture</CardTitle>
+          <CardDescription className="text-center">
+            Capture a screenshot of any website to test the feature
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={testUrl}
+                onChange={(e) => setTestUrl(e.target.value)}
+                placeholder="Enter any URL (e.g., fast.com, https://example.com)"
+                className="w-full h-12 px-4 border border-input bg-background text-lg rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                disabled={capturingTest}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !capturingTest && testUrl.trim()) {
+                    captureTestUrl()
+                  }
+                }}
+              />
+            </div>
+            <Button
+              onClick={captureTestUrl}
+              disabled={capturingTest || !testUrl.trim()}
+              className="h-12 px-6 flex items-center gap-2"
+            >
+              <Camera className="h-4 w-4" />
+              Capture Screenshot
+            </Button>
+          </div>
+          {capturingTest && (
+            <div className="text-center space-y-2">
+              <div className="text-sm text-muted-foreground">{testMessage}</div>
+              <Progress value={testProgress} className="w-full h-2" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Test Progress Dialog */}
+      <AlertDialog open={capturingTest}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center flex items-center justify-center gap-2">
+              <Camera className="h-5 w-5" />
+              Capturing Test Screenshot
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Taking a screenshot of the test URL
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-6 text-center">
+            <div>
+              <div className="text-6xl font-bold text-primary mb-3">
+                <NumberFlow 
+                  value={testProgress}
+                  format={{ maximumFractionDigits: 0, minimumIntegerDigits: 1 }}
+                  suffix="%"
+                  willChange
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">{testMessage}</div>
+            </div>
+            <Progress value={testProgress} className="w-full h-3" />
+            <p className="text-xs text-muted-foreground">
+              This may take a few seconds
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setCapturingTest(false)
+                setTestProgress(0)
+                setTestMessage('')
+              }}
+              className="mt-4"
+            >
+              Cancel Test
+            </Button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Progress Dialog */}
       <AlertDialog open={capturingAll}>
         <AlertDialogContent className="sm:max-w-md">
           <AlertDialogHeader>

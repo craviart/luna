@@ -16,9 +16,12 @@ export default async function handler(req, res) {
 
   const { url, urlId } = req.body
 
-  if (!url || !urlId) {
-    return res.status(400).json({ error: 'URL and urlId are required' })
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required' })
   }
+
+  // Check if this is a test capture (starts with 'test-')
+  const isTestCapture = urlId && urlId.toString().startsWith('test-')
 
   console.log(`📸 Starting screenshot capture for: ${url}`)
   const startTime = Date.now()
@@ -102,21 +105,25 @@ export default async function handler(req, res) {
       .from('website-screenshots')
       .getPublicUrl(filename)
 
-    // Save metadata to database
-    console.log(`💾 Saving metadata to database...`)
-    const { data: dbData, error: dbError } = await supabase
-      .from('website_screenshots')
-      .insert({
-        url_id: urlId,
-        image_url: publicUrl,
-        captured_at: new Date().toISOString(),
-        viewport_width: 1200,
-        viewport_height: 800
-      })
+    // Save metadata to database (only for real monitored URLs, not test captures)
+    if (!isTestCapture && urlId) {
+      console.log(`💾 Saving metadata to database...`)
+      const { data: dbData, error: dbError } = await supabase
+        .from('website_screenshots')
+        .insert({
+          url_id: urlId,
+          image_url: publicUrl,
+          captured_at: new Date().toISOString(),
+          viewport_width: 1200,
+          viewport_height: 800
+        })
 
-    if (dbError) {
-      console.error('Database error:', dbError)
-      return res.status(500).json({ error: 'Failed to save screenshot metadata' })
+      if (dbError) {
+        console.error('Database error:', dbError)
+        return res.status(500).json({ error: 'Failed to save screenshot metadata' })
+      }
+    } else {
+      console.log(`🧪 Test capture - skipping database save`)
     }
 
     const loadTime = ((Date.now() - startTime) / 1000).toFixed(1)
