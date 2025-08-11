@@ -40,11 +40,15 @@ export default async function handler(req, res) {
     let serviceUsed = 'template'
     
     // Try AbstractAPI for real screenshots (if API key provided)
-    if (process.env.ABSTRACT_API_KEY) {
+    const apiKey = process.env.ABSTRACT_API_KEY
+    console.log('🔍 API Key check:', apiKey ? `Key exists (${apiKey.substring(0, 8)}...)` : 'No API key found')
+    
+    if (apiKey) {
       try {
         console.log('🔄 Attempting real screenshot with AbstractAPI...')
         
-        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${process.env.ABSTRACT_API_KEY}&url=${encodeURIComponent(validUrl)}&capture_full_page=true&image_quality=high&export_format=png`
+        const abstractUrl = `https://screenshot.abstractapi.com/v1/?api_key=${apiKey}&url=${encodeURIComponent(validUrl)}&capture_full_page=true&image_quality=high&export_format=png&delay=3`
+        console.log('📡 AbstractAPI URL:', abstractUrl.replace(apiKey, 'HIDDEN_KEY'))
         
         const response = await fetch(abstractUrl, {
           method: 'GET',
@@ -53,12 +57,17 @@ export default async function handler(req, res) {
           }
         })
         
+        console.log('📡 AbstractAPI response:', response.status, response.statusText)
+        console.log('📡 Content-Type:', response.headers.get('content-type'))
+        
         if (response.ok && response.headers.get('content-type')?.includes('image')) {
           console.log('✅ Real screenshot captured with AbstractAPI!')
           const imageBuffer = await response.arrayBuffer()
+          console.log('📏 Image size:', imageBuffer.byteLength, 'bytes')
           
           // Convert image to base64 and embed in SVG
           const base64Image = Buffer.from(imageBuffer).toString('base64')
+          console.log('🔄 Base64 conversion complete, length:', base64Image.length)
           
           svgContent = `<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
   <!-- Browser Chrome -->
@@ -74,8 +83,9 @@ export default async function handler(req, res) {
 </svg>`
           serviceUsed = 'AbstractAPI'
         } else {
-          console.log(`⚠️ AbstractAPI failed: ${response.status}`)
-          throw new Error(`AbstractAPI failed: ${response.status}`)
+          const errorText = await response.text()
+          console.log(`⚠️ AbstractAPI failed: ${response.status} - ${errorText}`)
+          throw new Error(`AbstractAPI failed: ${response.status} - ${errorText}`)
         }
       } catch (error) {
         console.log('⚠️ AbstractAPI error:', error.message)
