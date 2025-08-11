@@ -168,61 +168,61 @@ export default function Dashboard() {
       return () => clearTimeout(timer)
     }, [actualScore])
     
-    // Chart data for radial chart
+    // Chart data matching the shadcn example structure
     const chartData = [
-      { 
-        performance: animatedScore,
-        fill: getPerformanceColor(score)
-      }
+      {
+        month: "performance",
+        desktop: animatedScore,
+        mobile: 0,
+      },
     ]
     
     const chartConfig = {
-      performance: {
-        label: "Performance Score"
-      }
+      desktop: {
+        label: "Performance",
+        color: getPerformanceColor(score),
+      },
+      mobile: {
+        label: "Mobile",
+        color: "hsl(var(--muted))",
+      },
     }
     
+    const totalScore = animatedScore
+    
     return (
-      <div className="mx-auto w-48 h-32">
+      <div className="mx-auto aspect-square max-h-[250px]">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-32"
+          className="mx-auto aspect-square max-h-[250px]"
         >
           <RadialBarChart
             data={chartData}
-            startAngle={180}
-            endAngle={0}
-            innerRadius={30}
-            outerRadius={60}
+            endAngle={180}
+            innerRadius={80}
+            outerRadius={140}
           >
-            <PolarGrid
-              gridType="circle"
-              radialLines={false}
-              stroke="none"
-              className="first:fill-muted last:fill-background"
-              polarRadius={[32, 58]}
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
             />
-            <RadialBar
-              dataKey="performance"
-              background
-              cornerRadius={10}
-            />
-            <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-            <PolarRadiusAxis tick={false} domain={[0, 100]} angle={90} />
+            <PolarRadiusAxis tick={false} tickCount={3} axisLine={false} />
+            <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" />
+            <RadialBar dataKey="mobile" fill="transparent" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
           </RadialBarChart>
         </ChartContainer>
         
-        {/* Score text overlay */}
-        <div className="absolute inset-0 flex items-end justify-center pb-1">
+        {/* Score text overlay - positioned in center */}
+        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-2">
           <div className="text-center">
-            <NumberFlow 
-              value={animatedScore} 
-              className="font-bold leading-none"
-              style={{ fontSize: '48px' }}
-              format={{ maximumFractionDigits: 0 }}
-              willChange
-            />
-            <div className="text-xs text-muted-foreground mt-1">Score</div>
+            <div className="text-4xl font-bold">
+              <NumberFlow 
+                value={animatedScore} 
+                format={{ maximumFractionDigits: 0 }}
+                willChange
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">Score</div>
           </div>
         </div>
       </div>
@@ -536,7 +536,7 @@ export default function Dashboard() {
                     {url.latestAnalysis ? (
                       <>
                         {/* Performance Score - Speedometer */}
-                        <div className="text-center py-4 bg-muted/50 rounded-lg">
+                        <div className="text-center py-2 bg-muted/50 rounded-lg">
                           <div className="text-sm text-muted-foreground mb-2">Performance Score</div>
                           <SpeedometerChart score={url.latestAnalysis.performance_score} />
                         </div>
