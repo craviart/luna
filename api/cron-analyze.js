@@ -16,22 +16,24 @@ export default async function handler(req, res) {
   console.log('- Authorization:', req.headers['authorization'] || 'undefined')
   console.log('- All headers:', Object.keys(req.headers))
   
-  // Security: Verify this is a legitimate Vercel cron request
+  // Security: Verify this is a legitimate automated request (Vercel cron OR GitHub Actions)
   const userAgent = req.headers['user-agent'] || ''
   const isVercelCron = userAgent === 'vercel-cron/1.0'
+  const isGitHubActions = userAgent.includes('GitHub-Actions-Luna-Analytics')
   
-  if (!isVercelCron) {
-    console.log('❌ Unauthorized: Not from Vercel cron')
-    console.log('- Expected User-Agent: vercel-cron/1.0')
+  if (!isVercelCron && !isGitHubActions) {
+    console.log('❌ Unauthorized: Not from authorized automation')
+    console.log('- Expected User-Agent: vercel-cron/1.0 OR GitHub-Actions-Luna-Analytics/*')
     console.log('- Received User-Agent:', userAgent)
     return res.status(401).json({ 
       error: 'Unauthorized - Invalid user agent',
-      expected: 'vercel-cron/1.0',
+      expected: ['vercel-cron/1.0', 'GitHub-Actions-Luna-Analytics/*'],
       received: userAgent
     })
   }
   
-  console.log('✅ Verified Vercel cron request')
+  const source = isVercelCron ? 'Vercel Cron' : 'GitHub Actions'
+  console.log(`✅ Verified automated request from: ${source}`)
 
   console.log('Automatic cron job started at:', new Date().toISOString())
 
