@@ -157,25 +157,30 @@ export default function Dashboard() {
   // Speedometer Component
   const SpeedometerChart = ({ score }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
-    const [animatedPercentage, setAnimatedPercentage] = useState(0)
     const actualScore = score || 0
     const percentage = Math.min(Math.max(actualScore, 0), 100)
     
     // Animate from 0 to actual score on mount/change
     useEffect(() => {
       setAnimatedScore(0) // Reset to 0 first
-      setAnimatedPercentage(0)
       const timer = setTimeout(() => {
         setAnimatedScore(actualScore)
-        setAnimatedPercentage(percentage)
       }, 200)
       return () => clearTimeout(timer)
-    }, [actualScore, percentage])
+    }, [actualScore])
     
-    // Calculate path length for dash array (semicircle circumference)
+    // Calculate the angle for the arc (180 degrees = π radians for semicircle)
+    const angle = (percentage / 100) * 180
     const radius = 50
-    const circumference = Math.PI * radius // Half circle
-    const strokeLength = (animatedPercentage / 100) * circumference
+    const centerX = 90
+    const centerY = 75
+    
+    // Calculate end point of the arc
+    const endX = centerX + radius * Math.cos((180 - angle) * Math.PI / 180)
+    const endY = centerY - radius * Math.sin((180 - angle) * Math.PI / 180)
+    
+    // Large arc flag for SVG path
+    const largeArcFlag = angle > 180 ? 1 : 0
     
     return (
       <div className="relative w-48 h-32 mx-auto">
@@ -189,19 +194,16 @@ export default function Dashboard() {
             strokeLinecap="round"
           />
           {/* Colored arc based on score - only show the portion based on percentage */}
-          <path
-            d="M 20 75 A 50 50 0 0 1 160 75"
-            stroke={getPerformanceColor(score)}
-            strokeWidth="8"
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={`${strokeLength} ${circumference}`}
-            strokeDashoffset="0"
-            className="transition-all duration-1000 ease-out"
-            style={{
-              transformOrigin: '90px 75px',
-            }}
-          />
+          {percentage > 0 && (
+            <path
+              d={`M 20 75 A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY}`}
+              stroke={getPerformanceColor(score)}
+              strokeWidth="8"
+              fill="none"
+              strokeLinecap="round"
+              className="transition-all duration-1000 ease-out"
+            />
+          )}
         </svg>
         
         {/* Score text */}
