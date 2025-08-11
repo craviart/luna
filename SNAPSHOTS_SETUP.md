@@ -12,7 +12,7 @@ Run the following SQL in your Supabase dashboard to create the necessary table:
 -- Create website_screenshots table
 CREATE TABLE IF NOT EXISTS website_screenshots (
   id SERIAL PRIMARY KEY,
-  url_id INTEGER REFERENCES urls(id) ON DELETE CASCADE,
+  url_id UUID REFERENCES urls(id) ON DELETE CASCADE,
   image_url TEXT NOT NULL,
   captured_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   viewport_width INTEGER DEFAULT 1200,
