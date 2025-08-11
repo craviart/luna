@@ -168,12 +168,12 @@ export default function Dashboard() {
       return () => clearTimeout(timer)
     }, [actualScore])
     
-    // Chart data matching the shadcn example structure
+    // Chart data - desktop shows the score, mobile shows the remaining portion
     const chartData = [
       {
         month: "performance",
         desktop: animatedScore,
-        mobile: 0,
+        mobile: 100 - animatedScore, // Rest of the semicircle
       },
     ]
     
@@ -183,7 +183,7 @@ export default function Dashboard() {
         color: getPerformanceColor(score),
       },
       mobile: {
-        label: "Mobile",
+        label: "Remaining",
         color: "hsl(var(--muted))",
       },
     }
@@ -202,13 +202,9 @@ export default function Dashboard() {
             innerRadius={80}
             outerRadius={140}
           >
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
             <PolarRadiusAxis tick={false} tickCount={3} axisLine={false} />
             <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" />
-            <RadialBar dataKey="mobile" fill="transparent" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
+            <RadialBar dataKey="mobile" fill="hsl(var(--muted))" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
           </RadialBarChart>
         </ChartContainer>
         
