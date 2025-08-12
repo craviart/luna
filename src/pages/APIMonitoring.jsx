@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase-simple'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+// Charts will be added later - for now show basic data
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 const APIMonitoring = () => {
   const [dailyUsage, setDailyUsage] = useState([])
@@ -18,6 +19,7 @@ const APIMonitoring = () => {
   const loadMonitoringData = async () => {
     try {
       setLoading(true)
+      console.log('Loading monitoring data...')
       
       // Load daily usage summary
       const { data: dailyData, error: dailyError } = await supabase
@@ -26,14 +28,14 @@ const APIMonitoring = () => {
         .order('usage_date', { ascending: false })
         .limit(7)
 
-      if (dailyError) throw dailyError
+      console.log('Daily data:', dailyData, 'Error:', dailyError)
 
-      // Load API health status
+      // Load API health status  
       const { data: healthData, error: healthError } = await supabase
         .from('api_health_status')
         .select('*')
 
-      if (healthError) throw healthError
+      console.log('Health data:', healthData, 'Error:', healthError)
 
       // Load recent logs (last 50)
       const { data: logsData, error: logsError } = await supabase
@@ -42,11 +44,17 @@ const APIMonitoring = () => {
         .order('timestamp', { ascending: false })
         .limit(50)
 
-      if (logsError) throw logsError
+      console.log('Logs data:', logsData, 'Error:', logsError)
 
+      // Don't throw errors immediately - set data even if some queries fail
       setDailyUsage(dailyData || [])
       setHealthStatus(healthData?.[0] || null)
       setRecentLogs(logsData || [])
+
+      // Only set error if all queries failed
+      if (dailyError && healthError && logsError) {
+        setError(`Database errors: ${dailyError?.message || ''}, ${healthError?.message || ''}, ${logsError?.message || ''}`)
+      }
 
     } catch (err) {
       console.error('Error loading monitoring data:', err)
@@ -113,6 +121,22 @@ const APIMonitoring = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">PageSpeed API Monitoring</h1>
       
+      {/* Debug Info */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Debug Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 text-sm">
+            <div>Loading: {loading ? 'Yes' : 'No'}</div>
+            <div>Error: {error || 'None'}</div>
+            <div>Daily Usage Records: {dailyUsage.length}</div>
+            <div>Health Status: {healthStatus ? 'Available' : 'None'}</div>
+            <div>Recent Logs: {recentLogs.length}</div>
+          </div>
+        </CardContent>
+      </Card>
+      
       {/* Health Status Overview */}
       {healthStatus && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -171,7 +195,7 @@ const APIMonitoring = () => {
         </div>
       )}
 
-      {/* Daily Usage Chart */}
+      {/* Daily Usage Summary */}
       {dailyUsage.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
@@ -179,16 +203,25 @@ const APIMonitoring = () => {
             <CardDescription>Request volume and success rates by day</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={dailyUsage.reverse()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="usage_date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="successful_requests" stackId="a" fill="#10b981" name="Successful" />
-                <Bar dataKey="failed_requests" stackId="a" fill="#ef4444" name="Failed" />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="space-y-4">
+              {dailyUsage.map((day, index) => (
+                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <div className="font-medium">{day.usage_date}</div>
+                    <div className="text-sm text-muted-foreground">{day.request_type}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold">{day.total_requests} total</div>
+                    <div className="text-sm">
+                      <span className="text-green-600">{day.successful_requests} success</span>
+                      {day.failed_requests > 0 && (
+                        <span className="text-red-600 ml-2">{day.failed_requests} failed</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
