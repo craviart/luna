@@ -19,6 +19,7 @@ export default async function handler(req, res) {
 
   try {
     console.log('PageSpeed-only Analysis function started')
+    console.log('API Key available:', !!process.env.PAGESPEED_API_KEY)
     const { url, urlId, isQuickTest } = req.body
 
     if (!url) {
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
         const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en${apiKey ? `&key=${apiKey}` : ''}`
         
         console.log(`PageSpeed API attempt ${attempt}/${maxRetries}:`, pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
+        console.log('API Key being used:', apiKey ? 'YES (key provided)' : 'NO (no key - using free tier)')
         
         // Progressive timeout: 12s, 16s, 20s (increased for better reliability)
         const timeoutMs = baseTimeout + (attempt - 1) * 4000
