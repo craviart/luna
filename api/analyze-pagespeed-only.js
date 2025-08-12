@@ -72,6 +72,12 @@ export default async function handler(req, res) {
         if (!pageSpeedResponse.ok) {
           const errorText = await pageSpeedResponse.text()
           console.error('PageSpeed API error response:', errorText)
+          
+          // Handle specific API errors
+          if (pageSpeedResponse.status === 429) {
+            throw new Error('PageSpeed API quota exceeded. Please try again later or contact support.')
+          }
+          
           throw new Error(`PageSpeed API HTTP ${pageSpeedResponse.status}: ${pageSpeedResponse.statusText}`)
         }
         
@@ -87,6 +93,10 @@ export default async function handler(req, res) {
         }
         
         if (pageSpeedData.error) {
+          // Handle quota exceeded errors specifically
+          if (pageSpeedData.error.code === 429 || pageSpeedData.error.message.includes('Quota exceeded')) {
+            throw new Error('PageSpeed API quota exceeded. Please try again later or contact support.')
+          }
           throw new Error(`PageSpeed API Error: ${pageSpeedData.error.message}`)
         }
         
