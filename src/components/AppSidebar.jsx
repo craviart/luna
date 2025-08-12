@@ -5,7 +5,8 @@ import {
   Shield,
   LogOut,
   Zap,
-  Target
+  Target,
+  Monitor
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useState } from "react"
@@ -98,6 +99,11 @@ const menuItems = [
     title: "Quick Testing",
     url: "/quick-testing",
     icon: Zap,
+  },
+  {
+    title: "API Monitoring",
+    url: "/api-monitoring",
+    icon: Monitor,
   },
           {
           title: "Snapshots",

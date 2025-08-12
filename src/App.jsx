@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from './components/ui/sonner'
-import { Loader2, BarChart3, Activity, Zap, Globe } from 'lucide-react'
+import { Loader2, BarChart3, Activity, Zap, Globe, Monitor } from 'lucide-react'
 
 import { ThemeProvider } from './components/theme-provider'
 import { ThemeToggle } from './components/theme-toggle'
@@ -16,6 +16,7 @@ import QuickTesting from './pages/QuickTesting'
 import QuickTestResult from './pages/QuickTestResult'
 import Snapshots from './pages/Snapshots'
 import ScreenshotTimeline from './pages/ScreenshotTimeline'
+import APIMonitoring from './pages/APIMonitoring'
 
 // Luna taglines for the dashboard
 const lunaTaglines = [
@@ -143,6 +144,12 @@ const getPageInfo = (pathname) => {
         icon: Zap,
         isDashboard: false
       }
+    case '/api-monitoring':
+      return {
+        title: 'API Monitoring',
+        icon: Monitor,
+        isDashboard: false
+      }
     case '/snapshots':
       return {
         title: 'Visual Snapshots',
@@ -220,6 +227,7 @@ function AuthenticatedApp() {
             <Route path="/urls/:id/results" element={<URLDetail />} />
             <Route path="/quick-testing" element={<QuickTesting />} />
             <Route path="/quick-testing/:id/results" element={<QuickTestResult />} />
+            <Route path="/api-monitoring" element={<APIMonitoring />} />
             <Route path="/snapshots" element={<Snapshots />} />
             <Route path="/snapshots/:id/timeline" element={<ScreenshotTimeline />} />
           </Routes>
