@@ -3,6 +3,21 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
 
+// Helper function to log API usage
+async function logApiUsage(data) {
+  try {
+    const { error } = await supabase
+      .from('api_usage_logs')
+      .insert(data)
+    
+    if (error) {
+      console.error('Failed to log API usage:', error.message)
+    }
+  } catch (err) {
+    console.error('Error logging API usage:', err.message)
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -17,8 +32,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  const functionStartTime = Date.now()
+  const requestId = req.headers['x-vercel-id'] || 'unknown'
+  
   try {
     console.log('PageSpeed-only Analysis function started')
+    console.log('API Key available:', !!process.env.PAGESPEED_API_KEY)
     const { url, urlId, isQuickTest } = req.body
 
     if (!url) {
@@ -41,97 +60,173 @@ export default async function handler(req, res) {
     let tbtTime = null
     let clsValue = null
 
-    try {
-      const apiKey = process.env.PAGESPEED_API_KEY
-      const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en${apiKey ? `&key=${apiKey}` : ''}`
-      
-      console.log('PageSpeed API URL:', pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
-      
-      // Add timeout to PageSpeed API call (Vercel Hobby has 10s limit)
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
-      
-      const pageSpeedResponse = await fetch(pageSpeedUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; Luna Analytics/1.0)'
-        },
-        signal: controller.signal
-      })
-      
-      clearTimeout(timeoutId)
-      
-      if (!pageSpeedResponse.ok) {
-        const errorText = await pageSpeedResponse.text()
-        console.error('PageSpeed API error response:', errorText)
-        throw new Error(`PageSpeed API HTTP ${pageSpeedResponse.status}: ${pageSpeedResponse.statusText}`)
-      }
-      
-      const responseText = await pageSpeedResponse.text()
-      console.log('PageSpeed API response received, parsing...')
-      
-      let pageSpeedData
+    // Retry logic with exponential backoff - increased timeouts for reliability
+    const maxRetries = 3
+    const baseTimeout = 12000 // Start with 12 seconds (increased from 6s)
+    let lastError = null
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        pageSpeedData = JSON.parse(responseText)
-      } catch (parseError) {
-        console.error('Failed to parse PageSpeed API response as JSON:', parseError.message)
-        throw new Error(`PageSpeed API returned invalid JSON: ${parseError.message}`)
+        const apiKey = process.env.PAGESPEED_API_KEY
+        const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en${apiKey ? `&key=${apiKey}` : ''}`
+        
+        console.log(`PageSpeed API attempt ${attempt}/${maxRetries}:`, pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
+        console.log('API Key being used:', apiKey ? 'YES (key provided)' : 'NO (no key - using free tier)')
+        
+        // Progressive timeout: 12s, 16s, 20s (increased for better reliability)
+        const timeoutMs = baseTimeout + (attempt - 1) * 4000
+        console.log(`Using ${timeoutMs}ms timeout for attempt ${attempt}`)
+        
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+        
+        const pageSpeedResponse = await fetch(pageSpeedUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; Luna Analytics/1.0)'
+          },
+          signal: controller.signal
+        })
+        
+        clearTimeout(timeoutId)
+      
+        if (!pageSpeedResponse.ok) {
+          const errorText = await pageSpeedResponse.text()
+          console.error('PageSpeed API error response:', errorText)
+          
+          // Handle specific API errors
+          if (pageSpeedResponse.status === 429) {
+            throw new Error('PageSpeed API quota exceeded. Please try again later or contact support.')
+          }
+          
+          throw new Error(`PageSpeed API HTTP ${pageSpeedResponse.status}: ${pageSpeedResponse.statusText}`)
+        }
+        
+        const responseText = await pageSpeedResponse.text()
+        console.log('PageSpeed API response received, parsing...')
+        
+        let pageSpeedData
+        try {
+          pageSpeedData = JSON.parse(responseText)
+        } catch (parseError) {
+          console.error('Failed to parse PageSpeed API response as JSON:', parseError.message)
+          throw new Error(`PageSpeed API returned invalid JSON: ${parseError.message}`)
+        }
+        
+        if (pageSpeedData.error) {
+          // Handle quota exceeded errors specifically
+          if (pageSpeedData.error.code === 429 || pageSpeedData.error.message.includes('Quota exceeded')) {
+            throw new Error('PageSpeed API quota exceeded. Please try again later or contact support.')
+          }
+          throw new Error(`PageSpeed API Error: ${pageSpeedData.error.message}`)
+        }
+        
+        // Extract performance metrics
+        if (pageSpeedData.lighthouseResult?.categories?.performance) {
+          performanceScore = Math.round(pageSpeedData.lighthouseResult.categories.performance.score * 100)
+          console.log('Performance Score:', performanceScore)
+        }
+        
+        // Extract Core Web Vitals from audits and convert to proper types
+        const audits = pageSpeedData.lighthouseResult?.audits || {}
+        
+        if (audits['first-contentful-paint']?.numericValue) {
+          fcpTime = Math.round(audits['first-contentful-paint'].numericValue) // Convert to integer
+          console.log('FCP from PageSpeed:', fcpTime, 'ms')
+        }
+        
+        if (audits['largest-contentful-paint']?.numericValue) {
+          lcpTime = Math.round(audits['largest-contentful-paint'].numericValue) // Convert to integer
+          console.log('LCP from PageSpeed:', lcpTime, 'ms')
+        }
+        
+        if (audits['speed-index']?.numericValue) {
+          speedIndexTime = Math.round(audits['speed-index'].numericValue) // Convert to integer
+          console.log('Speed Index from PageSpeed:', speedIndexTime, 'ms')
+        }
+        
+        if (audits['total-blocking-time']?.numericValue) {
+          tbtTime = Math.round(audits['total-blocking-time'].numericValue) // Convert to integer
+          console.log('TBT from PageSpeed:', tbtTime, 'ms')
+        }
+        
+        if (audits['cumulative-layout-shift']?.numericValue !== undefined) {
+          clsValue = parseFloat(audits['cumulative-layout-shift'].numericValue.toFixed(3)) // Keep as float with 3 decimals
+          console.log('CLS from PageSpeed:', clsValue)
+        }
+        
+        performanceData = pageSpeedData
+        console.log(`PageSpeed Insights data retrieved successfully on attempt ${attempt}`)
+        
+        // Success! Break out of retry loop
+        break
+        
+      } catch (attemptError) {
+        lastError = attemptError
+        console.error(`PageSpeed attempt ${attempt} failed:`, attemptError.message)
+        
+        // Handle specific timeout errors with proper scope
+        if (attemptError.name === 'AbortError') {
+          const timeoutMs = baseTimeout + (attempt - 1) * 4000  // Recalculate timeout for error message
+          console.log(`PageSpeed API timed out after ${timeoutMs}ms on attempt ${attempt}`)
+          lastError = new Error(`Analysis attempt ${attempt} timed out after ${timeoutMs/1000}s`)
+        }
+        
+        // If this was the last attempt, don't wait
+        if (attempt === maxRetries) {
+          console.log('All PageSpeed retry attempts failed')
+          break
+        }
+        
+        // Wait before retrying (exponential backoff: 2s, 4s)
+        const waitTime = Math.pow(2, attempt) * 1000 // 2s, 4s for attempts 1, 2
+        console.log(`Waiting ${waitTime}ms before retry ${attempt + 1}...`)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+      }
+    }
+    
+    // If we exhausted all retries, throw the last error
+    if (!performanceData && lastError) {
+      console.error(`PageSpeed API failed after ${maxRetries} attempts. Last error:`, lastError.message)
+      
+      if (lastError.message.includes('timed out')) {
+        throw new Error('Analysis failed - PageSpeed API is experiencing timeouts. Please try again in a few minutes.')
       }
       
-      if (pageSpeedData.error) {
-        throw new Error(`PageSpeed API Error: ${pageSpeedData.error.message}`)
+      // Provide more specific error messages based on error type
+      if (lastError.message.includes('HTTP 429')) {
+        throw new Error('PageSpeed API rate limit exceeded. Please try again in a few minutes.')
       }
       
-      // Extract performance metrics
-      if (pageSpeedData.lighthouseResult?.categories?.performance) {
-        performanceScore = Math.round(pageSpeedData.lighthouseResult.categories.performance.score * 100)
-        console.log('Performance Score:', performanceScore)
+      if (lastError.message.includes('HTTP 403')) {
+        throw new Error('PageSpeed API access denied. API key may be invalid or expired.')
       }
       
-      // Extract Core Web Vitals from audits and convert to proper types
-      const audits = pageSpeedData.lighthouseResult?.audits || {}
-      
-      if (audits['first-contentful-paint']?.numericValue) {
-        fcpTime = Math.round(audits['first-contentful-paint'].numericValue) // Convert to integer
-        console.log('FCP from PageSpeed:', fcpTime, 'ms')
+      if (lastError.message.includes('HTTP 400')) {
+        throw new Error('Invalid URL provided for PageSpeed analysis.')
       }
       
-      if (audits['largest-contentful-paint']?.numericValue) {
-        lcpTime = Math.round(audits['largest-contentful-paint'].numericValue) // Convert to integer
-        console.log('LCP from PageSpeed:', lcpTime, 'ms')
-      }
-      
-      if (audits['speed-index']?.numericValue) {
-        speedIndexTime = Math.round(audits['speed-index'].numericValue) // Convert to integer
-        console.log('Speed Index from PageSpeed:', speedIndexTime, 'ms')
-      }
-      
-      if (audits['total-blocking-time']?.numericValue) {
-        tbtTime = Math.round(audits['total-blocking-time'].numericValue) // Convert to integer
-        console.log('TBT from PageSpeed:', tbtTime, 'ms')
-      }
-      
-      if (audits['cumulative-layout-shift']?.numericValue !== undefined) {
-        clsValue = parseFloat(audits['cumulative-layout-shift'].numericValue.toFixed(3)) // Keep as float with 3 decimals
-        console.log('CLS from PageSpeed:', clsValue)
-      }
-      
-      performanceData = pageSpeedData
-      console.log('PageSpeed Insights data retrieved successfully')
-      
-    } catch (pageSpeedError) {
-      console.error('PageSpeed Insights failed:', pageSpeedError.message)
-      
-      // Handle specific timeout errors
-      if (pageSpeedError.name === 'AbortError') {
-        console.log('PageSpeed API timed out after 8 seconds')
-        throw new Error('Analysis timed out - PageSpeed API is taking too long. Please try again later.')
-      }
-      
-      throw new Error(`PageSpeed API failed: ${pageSpeedError.message}`)
+      throw new Error(`PageSpeed API failed after ${maxRetries} attempts: ${lastError.message}`)
     }
 
     const loadTime = Math.round(Date.now() - startTime) // Ensure integer
     console.log('Analysis completed in:', loadTime, 'ms')
+    
+    // Log successful API usage
+    await logApiUsage({
+      request_url: url,
+      request_type: isQuickTest ? 'quick_test' : 'monitored_url',
+      http_status: 200,
+      response_time_ms: loadTime,
+      success: true,
+      api_key_used: !!process.env.PAGESPEED_API_KEY,
+      performance_score: performanceScore || 0,
+      fcp_time: fcpTime || 0,
+      lcp_time: lcpTime || 0,
+      speed_index: speedIndexTime || 0,
+      total_blocking_time: tbtTime || 0,
+      cumulative_layout_shift: clsValue || 0.0,
+      vercel_function_id: requestId
+    })
 
     // Save to database (unified approach for both monitored URLs and quick tests)
     if (isQuickTest) {
@@ -224,6 +319,37 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('PageSpeed-only analysis error:', error.message)
     console.error('Error stack:', error.stack)
+    
+    // Log failed API usage
+    const totalTime = Math.round(Date.now() - functionStartTime)
+    let errorCode = 'UNKNOWN_ERROR'
+    let httpStatus = 500
+    
+    if (error.message.includes('quota exceeded')) {
+      errorCode = 'QUOTA_EXCEEDED'
+      httpStatus = 429
+    } else if (error.message.includes('timed out')) {
+      errorCode = 'TIMEOUT'
+      httpStatus = 408
+    } else if (error.message.includes('Invalid URL')) {
+      errorCode = 'INVALID_URL'
+      httpStatus = 400
+    } else if (error.message.includes('API access denied')) {
+      errorCode = 'ACCESS_DENIED'
+      httpStatus = 403
+    }
+    
+    await logApiUsage({
+      request_url: req.body?.url || 'unknown',
+      request_type: req.body?.isQuickTest ? 'quick_test' : 'monitored_url',
+      http_status: httpStatus,
+      response_time_ms: totalTime,
+      success: false,
+      error_message: error.message,
+      error_code: errorCode,
+      api_key_used: !!process.env.PAGESPEED_API_KEY,
+      vercel_function_id: requestId
+    })
 
     if (res.headersSent) {
       console.error('Response headers already sent')

@@ -2,10 +2,11 @@ name: 🔄 Automatic Website Analysis
 
 on:
   schedule:
-    # Run 3 times daily: 6 AM, 2 PM, and 10 PM UTC
-    - cron: '0 6 * * *'   # 6:00 AM UTC
-    - cron: '0 14 * * *'  # 2:00 PM UTC  
-    - cron: '0 22 * * *'  # 10:00 PM UTC
+    # Run 3 times daily: 7 AM, 1 PM, and 9 PM London time
+    # Note: GitHub Actions runs in UTC, these times account for BST (British Summer Time)
+    - cron: '0 6 * * *'   # 7:00 AM London (6 AM UTC + 1 hour BST, 7 AM UTC in winter)
+    - cron: '0 12 * * *'  # 1:00 PM London (12 PM UTC + 1 hour BST, 1 PM UTC in winter)  
+    - cron: '0 20 * * *'  # 9:00 PM London (8 PM UTC + 1 hour BST, 9 PM UTC in winter)
   
   # Allow manual triggering from GitHub Actions UI
   workflow_dispatch:
