@@ -164,8 +164,9 @@ export default async function handler(req, res) {
         lastError = attemptError
         console.error(`PageSpeed attempt ${attempt} failed:`, attemptError.message)
         
-        // Handle specific timeout errors
+        // Handle specific timeout errors with proper scope
         if (attemptError.name === 'AbortError') {
+          const timeoutMs = baseTimeout + (attempt - 1) * 4000  // Recalculate timeout for error message
           console.log(`PageSpeed API timed out after ${timeoutMs}ms on attempt ${attempt}`)
           lastError = new Error(`Analysis attempt ${attempt} timed out after ${timeoutMs/1000}s`)
         }
