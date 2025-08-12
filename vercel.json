@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/analyze-pagespeed-only.js": {
-      "maxDuration": 60,
+      "maxDuration": 90,
       "memory": 1024
     },
     "api/cron-analyze.js": {

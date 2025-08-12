@@ -41,9 +41,9 @@ export default async function handler(req, res) {
     let tbtTime = null
     let clsValue = null
 
-    // Retry logic with exponential backoff
+    // Retry logic with exponential backoff - increased timeouts for reliability
     const maxRetries = 3
-    const baseTimeout = 6000 // Start with 6 seconds
+    const baseTimeout = 12000 // Start with 12 seconds (increased from 6s)
     let lastError = null
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -53,8 +53,8 @@ export default async function handler(req, res) {
         
         console.log(`PageSpeed API attempt ${attempt}/${maxRetries}:`, pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
         
-        // Progressive timeout: 6s, 8s, 10s
-        const timeoutMs = baseTimeout + (attempt - 1) * 2000
+        // Progressive timeout: 12s, 16s, 20s (increased for better reliability)
+        const timeoutMs = baseTimeout + (attempt - 1) * 4000
         console.log(`Using ${timeoutMs}ms timeout for attempt ${attempt}`)
         
         const controller = new AbortController()
@@ -146,18 +146,34 @@ export default async function handler(req, res) {
           break
         }
         
-        // Wait before retrying (exponential backoff: 1s, 2s, 4s)
-        const waitTime = Math.pow(2, attempt - 1) * 1000
-        console.log(`Waiting ${waitTime}ms before retry...`)
+        // Wait before retrying (exponential backoff: 2s, 4s)
+        const waitTime = Math.pow(2, attempt) * 1000 // 2s, 4s for attempts 1, 2
+        console.log(`Waiting ${waitTime}ms before retry ${attempt + 1}...`)
         await new Promise(resolve => setTimeout(resolve, waitTime))
       }
     }
     
     // If we exhausted all retries, throw the last error
     if (!performanceData && lastError) {
+      console.error(`PageSpeed API failed after ${maxRetries} attempts. Last error:`, lastError.message)
+      
       if (lastError.message.includes('timed out')) {
         throw new Error('Analysis failed - PageSpeed API is experiencing timeouts. Please try again in a few minutes.')
       }
+      
+      // Provide more specific error messages based on error type
+      if (lastError.message.includes('HTTP 429')) {
+        throw new Error('PageSpeed API rate limit exceeded. Please try again in a few minutes.')
+      }
+      
+      if (lastError.message.includes('HTTP 403')) {
+        throw new Error('PageSpeed API access denied. API key may be invalid or expired.')
+      }
+      
+      if (lastError.message.includes('HTTP 400')) {
+        throw new Error('Invalid URL provided for PageSpeed analysis.')
+      }
+      
       throw new Error(`PageSpeed API failed after ${maxRetries} attempts: ${lastError.message}`)
     }
 

@@ -183,6 +183,7 @@ export default function URLDetail() {
     setProgressMessage('Initializing analysis...')
     
     let progressInterval = null
+    let timeoutId = null
     
     try {
       // Start with immediate progress updates 
@@ -198,6 +199,9 @@ export default function URLDetail() {
       }, 1000) // Update every second
       
       // Make the actual API call with timeout handling
+      const controller = new AbortController()
+      timeoutId = setTimeout(() => controller.abort(), 85000) // 85 seconds (just under Vercel's 90s limit)
+      
       const response = await fetch('/api/analyze-pagespeed-only', {
         method: 'POST',
         headers: {
@@ -207,7 +211,10 @@ export default function URLDetail() {
           url: url.url,
           urlId: url.id
         }),
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
       
       clearInterval(progressInterval)
       setProgress(85)
@@ -256,8 +263,27 @@ export default function URLDetail() {
         clearInterval(progressInterval)
       }
       
-      toast.error('Analysis failed: ' + error.message)
+      // Clean up timeout if it exists
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      
+      // Handle specific error types
+      let errorMessage = error.message
+      if (error.name === 'AbortError') {
+        errorMessage = 'Analysis timed out after 85 seconds. The PageSpeed API may be experiencing delays. Please try again in a few minutes.'
+      }
+      
+      toast.error('Analysis failed: ' + errorMessage)
     } finally {
+      // Clean up all timers and intervals
+      if (progressInterval) {
+        clearInterval(progressInterval)
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      
       setIsAnalyzing(false)
       setProgress(0)
       setProgressMessage('')
