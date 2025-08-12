@@ -47,11 +47,18 @@ export default async function handler(req, res) {
       
       console.log('PageSpeed API URL:', pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
       
+      // Add timeout to PageSpeed API call (Vercel Hobby has 10s limit)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+      
       const pageSpeedResponse = await fetch(pageSpeedUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; Luna Analytics/1.0)'
-        }
+        },
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
       
       if (!pageSpeedResponse.ok) {
         const errorText = await pageSpeedResponse.text()
@@ -113,6 +120,13 @@ export default async function handler(req, res) {
       
     } catch (pageSpeedError) {
       console.error('PageSpeed Insights failed:', pageSpeedError.message)
+      
+      // Handle specific timeout errors
+      if (pageSpeedError.name === 'AbortError') {
+        console.log('PageSpeed API timed out after 8 seconds')
+        throw new Error('Analysis timed out - PageSpeed API is taking too long. Please try again later.')
+      }
+      
       throw new Error(`PageSpeed API failed: ${pageSpeedError.message}`)
     }
 

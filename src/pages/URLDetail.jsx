@@ -182,12 +182,22 @@ export default function URLDetail() {
     setProgress(0)
     setProgressMessage('Initializing analysis...')
     
+    let progressInterval = null
+    
     try {
-      // Start with immediate progress updates (no artificial delays)
+      // Start with immediate progress updates 
       setProgress(5)
       setProgressMessage('Connecting to PageSpeed Insights API...')
       
-      // Make the actual API call immediately (no more fake progress steps)
+      // Set up progressive feedback during API call
+      progressInterval = setInterval(() => {
+        setProgress(prev => {
+          if (prev < 75) return prev + 5
+          return prev
+        })
+      }, 1000) // Update every second
+      
+      // Make the actual API call with timeout handling
       const response = await fetch('/api/analyze-pagespeed-only', {
         method: 'POST',
         headers: {
@@ -198,8 +208,8 @@ export default function URLDetail() {
           urlId: url.id
         }),
       })
-
-      // Update progress while waiting for response
+      
+      clearInterval(progressInterval)
       setProgress(85)
       setProgressMessage('Processing performance metrics...')
 
@@ -240,6 +250,12 @@ export default function URLDetail() {
       }
     } catch (error) {
       console.error('Analysis error:', error)
+      
+      // Clean up progress interval if it exists
+      if (progressInterval) {
+        clearInterval(progressInterval)
+      }
+      
       toast.error('Analysis failed: ' + error.message)
     } finally {
       setIsAnalyzing(false)
