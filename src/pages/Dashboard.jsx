@@ -496,27 +496,29 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col p-8">
-      <div className="max-w-7xl mx-auto w-full space-y-8">
+    <div className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-6 sm:space-y-8">
         
         {/* Page Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Performance overview and monitoring insights
             </p>
           </div>
-          <TimeRangeSelector 
-            value={timeRange} 
-            onValueChange={setTimeRange}
-          />
+          <div className="flex-shrink-0">
+            <TimeRangeSelector 
+              value={timeRange} 
+              onValueChange={setTimeRange}
+            />
+          </div>
         </div>
 
         {/* Monitored Websites Cards */}
         {monitoredUrls.length > 0 && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {monitoredUrls.map((url) => (
                 <Card key={url.id} className="h-full">
                   <CardHeader className="pb-4">
@@ -755,18 +757,19 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold mb-6">Recent Test History</h2>
             <Card>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Website</TableHead>
-                      <TableHead>Performance</TableHead>
-                      <TableHead>FCP</TableHead>
-                      <TableHead>LCP</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-20">Type</TableHead>
+                        <TableHead className="min-w-48">Website</TableHead>
+                        <TableHead className="min-w-24">Performance</TableHead>
+                        <TableHead className="min-w-20">FCP</TableHead>
+                        <TableHead className="min-w-20">LCP</TableHead>
+                        <TableHead className="min-w-24">Date</TableHead>
+                        <TableHead className="min-w-24">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
                   <TableBody>
                     {allAnalyses.slice(0, 10).map((analysis) => (
                       <TableRow key={`${analysis.type}-${analysis.id}`}>
@@ -829,7 +832,8 @@ export default function Dashboard() {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -838,11 +842,11 @@ export default function Dashboard() {
         {/* Navigation Cards - Show when no dashboard URLs */}
         {monitoredUrls.length === 0 && (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-8 text-center">
-                  <LinkIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <CardTitle className="mb-2">Monitored Pages</CardTitle>
+                <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
+                  <LinkIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 text-muted-foreground" />
+                  <CardTitle className="mb-2 text-lg sm:text-xl">Monitored Pages</CardTitle>
                   <CardDescription className="mb-4">
                     Add websites for continuous monitoring and automatic daily analysis.
                   </CardDescription>
@@ -855,9 +859,9 @@ export default function Dashboard() {
               </Card>
               
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-8 text-center">
-                  <Zap className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <CardTitle className="mb-2">Quick Testing</CardTitle>
+                <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
+                  <Zap className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 text-muted-foreground" />
+                  <CardTitle className="mb-2 text-lg sm:text-xl">Quick Testing</CardTitle>
                   <CardDescription className="mb-4">
                     Run one-time performance analysis on any website instantly.
                   </CardDescription>

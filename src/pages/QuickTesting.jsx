@@ -295,13 +295,13 @@ export default function QuickTesting() {
 
 
   return (
-    <div className="flex flex-1 flex-col p-8">
-      <div className="max-w-7xl mx-auto w-full space-y-8">
+    <div className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Quick Testing</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Quick Testing</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Run one-time performance analysis on any website
             </p>
           </div>
@@ -309,11 +309,11 @@ export default function QuickTesting() {
 
         {/* Quick Test Form */}
         <Card>
-        <CardHeader className="text-center p-8">
-          <CardTitle className="text-3xl font-bold tracking-tight">
+        <CardHeader className="text-center p-4 sm:p-6 lg:p-8">
+          <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
             Test Any URL
           </CardTitle>
-          <CardDescription className="mt-2 text-lg text-muted-foreground">
+          <CardDescription className="mt-2 text-base sm:text-lg text-muted-foreground">
             Run a one-time performance analysis on any website. Results include FCP, LCP, and Performance Score.
           </CardDescription>
         </CardHeader>
@@ -375,13 +375,12 @@ export default function QuickTesting() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Performance</TableHead>
-                    <TableHead>FCP</TableHead>
-                    <TableHead>LCP</TableHead>
-
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="min-w-48">URL</TableHead>
+                    <TableHead className="min-w-24">Performance</TableHead>
+                    <TableHead className="min-w-20">FCP</TableHead>
+                    <TableHead className="min-w-20">LCP</TableHead>
+                    <TableHead className="min-w-24">Date</TableHead>
+                    <TableHead className="min-w-24">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

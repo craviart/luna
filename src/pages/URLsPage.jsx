@@ -426,8 +426,8 @@ export default function URLsPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col p-8">
-      <div className="max-w-7xl mx-auto w-full space-y-8">
+    <div className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
