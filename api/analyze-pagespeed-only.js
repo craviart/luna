@@ -41,12 +41,7 @@ export default async function handler(req, res) {
     let tbtTime = null
     let clsValue = null
 
-    // Retry logic with exponential backoff
-    const maxRetries = 3
-    const baseTimeout = 6000 // Start with 6 seconds
-    let lastError = null
-    
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+
       try {
         const apiKey = process.env.PAGESPEED_API_KEY
         const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en${apiKey ? `&key=${apiKey}` : ''}`
@@ -158,7 +153,6 @@ export default async function handler(req, res) {
       if (lastError.message.includes('timed out')) {
         throw new Error('Analysis failed - PageSpeed API is experiencing timeouts. Please try again in a few minutes.')
       }
-      throw new Error(`PageSpeed API failed after ${maxRetries} attempts: ${lastError.message}`)
     }
 
     const loadTime = Math.round(Date.now() - startTime) // Ensure integer
