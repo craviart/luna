@@ -365,7 +365,22 @@ export default function URLsPage() {
             }),
           })
 
-          const result = await response.json()
+          // Check if response is ok before parsing JSON
+          if (!response.ok) {
+            const errorText = await response.text()
+            console.error(`API response error for ${url.name}:`, errorText)
+            setBulkProgressMessage(`⚠️ Server error for ${url.name || url.url}`)
+            continue // Skip to next URL
+          }
+
+          let result
+          try {
+            result = await response.json()
+          } catch (parseError) {
+            console.error(`Failed to parse response for ${url.name}:`, parseError)
+            setBulkProgressMessage(`⚠️ Invalid response for ${url.name || url.url}`)
+            continue // Skip to next URL
+          }
           
           if (!result.success) {
             console.error(`Analysis failed for ${url.name}: ${result.message}`)

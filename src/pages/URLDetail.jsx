@@ -216,7 +216,20 @@ export default function URLDetail() {
         }),
       })
 
-      const result = await response.json()
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('API response error:', errorText)
+        throw new Error(`Server error (${response.status}): ${response.statusText}`)
+      }
+
+      let result
+      try {
+        result = await response.json()
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError)
+        throw new Error('Server returned invalid response. Please try again.')
+      }
       
       setProgress(99)
       setProgressMessage('Analysis complete!')
