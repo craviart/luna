@@ -295,11 +295,11 @@ export default function QuickTesting() {
 
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="max-w-7xl mx-auto w-full">
+    <div className="flex flex-1 flex-col p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Quick Testing</h1>
             <p className="text-muted-foreground">
               Run one-time performance analysis on any website
@@ -308,8 +308,8 @@ export default function QuickTesting() {
         </div>
 
         {/* Quick Test Form */}
-        <Card className="mb-12">
-        <CardHeader className="text-center">
+        <Card>
+        <CardHeader className="text-center p-8">
           <CardTitle className="text-3xl font-bold tracking-tight">
             Test Any URL
           </CardTitle>

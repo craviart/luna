@@ -496,12 +496,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="max-w-7xl mx-auto w-full">
+    <div className="flex flex-1 flex-col p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-8">
         
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">
               Performance overview and monitoring insights
@@ -515,7 +515,7 @@ export default function Dashboard() {
 
         {/* Monitored Websites Cards */}
         {monitoredUrls.length > 0 && (
-          <div className="mb-12">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {monitoredUrls.map((url) => (
                 <Card key={url.id} className="h-full">
@@ -837,10 +837,10 @@ export default function Dashboard() {
 
         {/* Navigation Cards - Show when no dashboard URLs */}
         {monitoredUrls.length === 0 && (
-          <div className="mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-8 text-center">
                   <LinkIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <CardTitle className="mb-2">Monitored Pages</CardTitle>
                   <CardDescription className="mb-4">
@@ -855,7 +855,7 @@ export default function Dashboard() {
               </Card>
               
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-8 text-center">
                   <Zap className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <CardTitle className="mb-2">Quick Testing</CardTitle>
                   <CardDescription className="mb-4">

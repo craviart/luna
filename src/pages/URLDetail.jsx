@@ -600,7 +600,7 @@ export default function URLDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto p-8">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading analysis results...</p>
@@ -613,7 +613,7 @@ export default function URLDetail() {
   if (!url) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto p-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <XCircle className="h-16 w-16 text-muted-foreground mb-4" />

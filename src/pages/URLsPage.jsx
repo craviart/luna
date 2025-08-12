@@ -68,7 +68,7 @@ function URLCard({ url, onMoveUp, onMoveDown, canMoveUp, canMoveDown }) {
   return (
     <Link to={`/urls/${url.id}/results`} className="block">
       <Card className="transition-all duration-200 hover:shadow-md hover:scale-[1.01] cursor-pointer">
-        <CardHeader className="p-4">
+        <CardHeader className="p-6">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0 pr-4">
               <div className="flex items-center justify-between mb-1">
@@ -426,10 +426,10 @@ export default function URLsPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="max-w-7xl mx-auto w-full">
+    <div className="flex flex-1 flex-col p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-4 mb-3">
               <div className="flex items-center gap-2 px-3 py-1 bg-green-50 dark:bg-green-950 rounded-full">
