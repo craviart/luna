@@ -183,28 +183,11 @@ export default function URLDetail() {
     setProgressMessage('Initializing analysis...')
     
     try {
-      // Optimized progress steps - faster and more accurate
-      const progressSteps = [
-        { progress: 8, message: 'Connecting to PageSpeed Insights API...', delay: 300 },
-        { progress: 15, message: 'Requesting performance audit...', delay: 400 },
-        { progress: 25, message: 'Loading page with mobile 4G simulation...', delay: 500 },
-        { progress: 35, message: 'Capturing First Contentful Paint (FCP)...', delay: 400 },
-        { progress: 45, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 400 },
-        { progress: 55, message: 'Analyzing Speed Index metrics...', delay: 300 },
-        { progress: 65, message: 'Evaluating Total Blocking Time (TBT)...', delay: 300 },
-        { progress: 75, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 300 },
-        { progress: 85, message: 'Generating performance score...', delay: 200 },
-        { progress: 95, message: 'Saving results...', delay: 200 }
-      ]
-
-      // Execute progress steps
-      for (const step of progressSteps) {
-        setProgress(step.progress)
-        setProgressMessage(step.message)
-        await new Promise(resolve => setTimeout(resolve, step.delay))
-      }
+      // Start with immediate progress updates (no artificial delays)
+      setProgress(5)
+      setProgressMessage('Connecting to PageSpeed Insights API...')
       
-      // Make the actual API call (using PageSpeed-only for reliability)
+      // Make the actual API call immediately (no more fake progress steps)
       const response = await fetch('/api/analyze-pagespeed-only', {
         method: 'POST',
         headers: {
@@ -215,6 +198,10 @@ export default function URLDetail() {
           urlId: url.id
         }),
       })
+
+      // Update progress while waiting for response
+      setProgress(85)
+      setProgressMessage('Processing performance metrics...')
 
       // Check if response is ok before parsing JSON
       if (!response.ok) {
@@ -231,9 +218,9 @@ export default function URLDetail() {
         throw new Error('Server returned invalid response. Please try again.')
       }
       
-      setProgress(99)
-      setProgressMessage('Analysis complete!')
-      await new Promise(resolve => setTimeout(resolve, 200))
+      setProgress(95)
+      setProgressMessage('Finalizing results...')
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       if (result.success) {
         // The API already saves to database, so we just need to reload

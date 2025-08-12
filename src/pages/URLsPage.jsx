@@ -328,29 +328,15 @@ export default function URLsPage() {
     try {
       const totalUrls = urlsWithScores.length
       
-      // Initial preparation phase
-      setBulkProgress(2)
-      setBulkProgressMessage('Preparing analysis queue...')
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      // Start immediately (no preparation delays)
       for (let i = 0; i < urlsWithScores.length; i++) {
         const url = urlsWithScores[i]
         const urlProgress = i / totalUrls * 100
         
-        // Start of individual analysis
+        // Start of individual analysis (no artificial delays)
         setCurrentAnalyzingUrl(url.name || url.url)
-        setBulkProgress(Math.round(urlProgress + 1))
-        setBulkProgressMessage(`Starting analysis for ${url.name || url.url}...`)
-        await new Promise(resolve => setTimeout(resolve, 300))
-        
-        // Mid-analysis progress
-        setBulkProgress(Math.round(urlProgress + (100 / totalUrls) * 0.3))
-        setBulkProgressMessage(`Gathering metrics for ${url.name || url.url}...`)
-        await new Promise(resolve => setTimeout(resolve, 400))
-        
-        setBulkProgress(Math.round(urlProgress + (100 / totalUrls) * 0.6))
-        setBulkProgressMessage(`Processing data for ${url.name || url.url}...`)
-        await new Promise(resolve => setTimeout(resolve, 300))
+        setBulkProgress(Math.round(urlProgress))
+        setBulkProgressMessage(`Analyzing ${url.name || url.url}...`)
         
         try {
           const response = await fetch('/api/analyze-pagespeed-only', {
@@ -393,22 +379,21 @@ export default function URLsPage() {
           setBulkProgressMessage(`❌ Error analyzing ${url.name || url.url}`)
         }
 
-        // Complete this URL's analysis
+        // Complete this URL's analysis (no delays)
         const progress = Math.round(((i + 1) / totalUrls) * 98) // Reserve last 2% for finalization
         setBulkProgress(progress)
-        await new Promise(resolve => setTimeout(resolve, 500))
       }
 
-      // Finalization phase
+      // Finalization phase (minimal delay)
       setBulkProgress(99)
       setBulkProgressMessage('Finalizing results...')
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 100))
       
       setBulkProgress(100)
       setBulkProgressMessage('Bulk analysis completed!')
       toast.success(`Analysis completed for ${totalUrls} website${totalUrls > 1 ? 's' : ''}!`)
       
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 200))
       
       // Reload URLs to get updated data
       await loadUrls()

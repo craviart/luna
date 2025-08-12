@@ -188,29 +188,11 @@ export default function QuickTesting() {
     setProgressMessage('Initializing analysis...')
 
     try {
-      // Optimized progress steps - faster and more accurate  
-      const progressSteps = [
-        { progress: 5, message: 'Initializing quick test environment...', delay: 200 },
-        { progress: 12, message: 'Connecting to PageSpeed Insights API...', delay: 300 },
-        { progress: 20, message: 'Requesting performance audit...', delay: 400 },
-        { progress: 30, message: 'Loading page with mobile 4G simulation...', delay: 500 },
-        { progress: 40, message: 'Capturing First Contentful Paint (FCP)...', delay: 400 },
-        { progress: 50, message: 'Measuring Largest Contentful Paint (LCP)...', delay: 400 },
-        { progress: 60, message: 'Analyzing Speed Index metrics...', delay: 300 },
-        { progress: 70, message: 'Evaluating Total Blocking Time (TBT)...', delay: 300 },
-        { progress: 80, message: 'Calculating Cumulative Layout Shift (CLS)...', delay: 300 },
-        { progress: 90, message: 'Generating performance score...', delay: 200 },
-        { progress: 96, message: 'Saving test results...', delay: 200 }
-      ]
+      // Start with immediate progress (no artificial delays)
+      setProgress(5)
+      setProgressMessage('Connecting to PageSpeed Insights API...')
 
-      // Execute progress steps
-      for (const step of progressSteps) {
-        setProgress(step.progress)
-        setProgressMessage(step.message)
-        await new Promise(resolve => setTimeout(resolve, step.delay))
-      }
-
-      // Make the actual API call (unified with monitored URLs approach)
+      // Make the actual API call immediately
       const response = await fetch('/api/analyze-pagespeed-only', {
         method: 'POST',
         headers: {
@@ -221,6 +203,10 @@ export default function QuickTesting() {
           isQuickTest: true 
         }),
       })
+
+      // Update progress while processing
+      setProgress(85)
+      setProgressMessage('Processing performance metrics...')
 
       // Check if response is ok before parsing JSON
       if (!response.ok) {
@@ -237,9 +223,9 @@ export default function QuickTesting() {
         throw new Error('Server returned invalid response. Please try again.')
       }
 
-      setProgress(96)
-      setProgressMessage('Saving results to database...')
-      await new Promise(resolve => setTimeout(resolve, 300))
+      setProgress(95)
+      setProgressMessage('Finalizing results...')
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       if (result.success) {
         // The API handles database saving, consistent with monitored URLs

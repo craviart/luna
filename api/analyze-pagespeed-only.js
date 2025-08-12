@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
     try {
       const apiKey = process.env.PAGESPEED_API_KEY
-      const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en${apiKey ? `&key=${apiKey}` : ''}`
+      const pageSpeedUrl = `https://pagespeedonline.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&locale=en&fields=lighthouseResult%2FcategoriesperformanceLevel%2FscorelighthouseResult%2Faudits%2Ffirst-contentful-paint%2FlighthouseResult%2Faudits%2Flargest-contentful-paint%2FlighthouseResult%2Faudits%2Fspeed-index%2FlighthouseResult%2Faudits%2Ftotal-blocking-time%2FlighthouseResult%2Faudits%2Fcumulative-layout-shift${apiKey ? `&key=${apiKey}` : ''}`
       
       console.log('PageSpeed API URL:', pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
       
