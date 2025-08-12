@@ -2,6 +2,9 @@
 
 A modern web performance monitoring dashboard built with React, Vite, and Supabase.
 
+<!-- Updated PageSpeed API key: 2025-08-12 -->
+<!-- Deployment trigger: New API key active -->
+
 ## ✨ Features
 
 - 📊 **Real-time Performance Monitoring** - Track FCP, LCP, Performance Score, Speed Index, TBT, and CLS

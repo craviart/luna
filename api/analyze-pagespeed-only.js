@@ -62,7 +62,7 @@ export default async function handler(req, res) {
 
     // Retry logic with exponential backoff - increased timeouts for reliability
     const maxRetries = 3
-    const baseTimeout = 12000 // Start with 12 seconds (increased from 6s)
+    const baseTimeout = 20000 // Start with 20 seconds for new API key testing
     let lastError = null
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -73,8 +73,8 @@ export default async function handler(req, res) {
         console.log(`PageSpeed API attempt ${attempt}/${maxRetries}:`, pageSpeedUrl.replace(apiKey || '', 'API_KEY_HIDDEN'))
         console.log('API Key being used:', apiKey ? 'YES (key provided)' : 'NO (no key - using free tier)')
         
-        // Progressive timeout: 12s, 16s, 20s (increased for better reliability)
-        const timeoutMs = baseTimeout + (attempt - 1) * 4000
+        // Progressive timeout: 20s, 25s, 30s (generous timeouts for new API key)
+        const timeoutMs = baseTimeout + (attempt - 1) * 5000
         console.log(`Using ${timeoutMs}ms timeout for attempt ${attempt}`)
         
         const controller = new AbortController()
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
         
         // Handle specific timeout errors with proper scope
         if (attemptError.name === 'AbortError') {
-          const timeoutMs = baseTimeout + (attempt - 1) * 4000  // Recalculate timeout for error message
+          const timeoutMs = baseTimeout + (attempt - 1) * 5000  // Recalculate timeout for error message
           console.log(`PageSpeed API timed out after ${timeoutMs}ms on attempt ${attempt}`)
           lastError = new Error(`Analysis attempt ${attempt} timed out after ${timeoutMs/1000}s`)
         }
