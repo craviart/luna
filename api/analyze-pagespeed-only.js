@@ -3,6 +3,21 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
 
+// Helper function to log API usage
+async function logApiUsage(data) {
+  try {
+    const { error } = await supabase
+      .from('api_usage_logs')
+      .insert(data)
+    
+    if (error) {
+      console.error('Failed to log API usage:', error.message)
+    }
+  } catch (err) {
+    console.error('Error logging API usage:', err.message)
+  }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -17,6 +32,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  const functionStartTime = Date.now()
+  const requestId = req.headers['x-vercel-id'] || 'unknown'
+  
   try {
     console.log('PageSpeed-only Analysis function started')
     console.log('API Key available:', !!process.env.PAGESPEED_API_KEY)
@@ -191,6 +209,23 @@ export default async function handler(req, res) {
 
     const loadTime = Math.round(Date.now() - startTime) // Ensure integer
     console.log('Analysis completed in:', loadTime, 'ms')
+    
+    // Log successful API usage
+    await logApiUsage({
+      request_url: url,
+      request_type: isQuickTest ? 'quick_test' : 'monitored_url',
+      http_status: 200,
+      response_time_ms: loadTime,
+      success: true,
+      api_key_used: !!process.env.PAGESPEED_API_KEY,
+      performance_score: performanceScore || 0,
+      fcp_time: fcpTime || 0,
+      lcp_time: lcpTime || 0,
+      speed_index: speedIndexTime || 0,
+      total_blocking_time: tbtTime || 0,
+      cumulative_layout_shift: clsValue || 0.0,
+      vercel_function_id: requestId
+    })
 
     // Save to database (unified approach for both monitored URLs and quick tests)
     if (isQuickTest) {
@@ -283,6 +318,37 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('PageSpeed-only analysis error:', error.message)
     console.error('Error stack:', error.stack)
+    
+    // Log failed API usage
+    const totalTime = Math.round(Date.now() - functionStartTime)
+    let errorCode = 'UNKNOWN_ERROR'
+    let httpStatus = 500
+    
+    if (error.message.includes('quota exceeded')) {
+      errorCode = 'QUOTA_EXCEEDED'
+      httpStatus = 429
+    } else if (error.message.includes('timed out')) {
+      errorCode = 'TIMEOUT'
+      httpStatus = 408
+    } else if (error.message.includes('Invalid URL')) {
+      errorCode = 'INVALID_URL'
+      httpStatus = 400
+    } else if (error.message.includes('API access denied')) {
+      errorCode = 'ACCESS_DENIED'
+      httpStatus = 403
+    }
+    
+    await logApiUsage({
+      request_url: req.body?.url || 'unknown',
+      request_type: req.body?.isQuickTest ? 'quick_test' : 'monitored_url',
+      http_status: httpStatus,
+      response_time_ms: totalTime,
+      success: false,
+      error_message: error.message,
+      error_code: errorCode,
+      api_key_used: !!process.env.PAGESPEED_API_KEY,
+      vercel_function_id: requestId
+    })
 
     if (res.headersSent) {
       console.error('Response headers already sent')
