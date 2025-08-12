@@ -198,7 +198,8 @@ export default function Dashboard() {
         >
           <RadialBarChart
             data={chartData}
-            endAngle={180}
+            startAngle={180}
+            endAngle={0}
             innerRadius={80}
             outerRadius={140}
           >
