@@ -714,52 +714,55 @@ export default function URLDetail() {
             </div>
             <div className="mt-4 lg:mt-0">
               {/* Time Range Selector and Action Buttons */}
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                 <TimeRangeSelector 
                   value={timeRange} 
                   onValueChange={setTimeRange}
                 />
-                {/* Action Buttons - Delete, Edit, Run Analysis in same line */}
-                <div className="flex items-center gap-2">
-                <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Delete
+                {/* Action Buttons - Delete, Edit inline, Run Analysis full width on mobile */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete this 
+                            monitored page and all its analysis history from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteUrl}>
+                            Delete Forever
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <Button variant="outline" size="sm" onClick={handleEditTitle}>
+                      Edit Title
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete this 
-                        monitored page and all its analysis history from our servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteUrl}>
-                        Delete Forever
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <Button variant="outline" size="sm" onClick={handleEditTitle}>
-                  Edit Title
-                </Button>
-                <Button 
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing}
-                  size="sm"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    'Run New Analysis'
-                  )}
-                </Button>
+                  </div>
+                  <Button 
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    size="sm"
+                    className="w-full lg:w-auto"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      'Run New Analysis'
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
