@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase-simple'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import { Alert, AlertDescription } from '../components/ui/alert'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 const APIMonitoring = () => {
@@ -99,11 +98,13 @@ const APIMonitoring = () => {
     return (
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">API Monitoring</h1>
-        <Alert>
-          <AlertDescription>
-            Error loading monitoring data: {error}
-          </AlertDescription>
-        </Alert>
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="text-red-600">
+              Error loading monitoring data: {error}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
