@@ -276,23 +276,27 @@ export default function Dashboard() {
     }
   }
 
-  // Chart configurations for different metrics using improved mono theme
+  // Chart configurations for different metrics using highly distinctive colors
   const getChartConfig = (urlNames, metricType) => {
     const config = {}
-    // Improved mono theme: better contrast while maintaining professional look
-    const monoColors = [
-      'hsl(0, 0%, 15%)',    // Very dark gray - high contrast
-      'hsl(0, 0%, 35%)',    // Dark gray
-      'hsl(0, 0%, 55%)',    // Medium gray  
-      'hsl(0, 0%, 75%)',    // Light gray
-      'hsl(0, 0%, 90%)',    // Very light gray
-      'hsl(0, 0%, 25%)',    // Additional dark shade
-      'hsl(0, 0%, 45%)',    // Additional medium shade
-      'hsl(0, 0%, 65%)'     // Additional light shade
+    // High-contrast, accessible color palette with maximum differentiation
+    const distinctiveColors = [
+      'hsl(220, 90%, 56%)',   // Bright blue
+      'hsl(142, 76%, 36%)',   // Green
+      'hsl(0, 84%, 60%)',     // Red
+      'hsl(262, 83%, 58%)',   // Purple
+      'hsl(45, 93%, 47%)',    // Amber/Orange
+      'hsl(332, 81%, 60%)',   // Pink
+      'hsl(195, 74%, 57%)',   // Cyan
+      'hsl(84, 81%, 44%)',    // Lime
+      'hsl(24, 95%, 53%)',    // Deep orange
+      'hsl(293, 69%, 49%)',   // Magenta
+      'hsl(200, 98%, 39%)',   // Deep blue
+      'hsl(120, 75%, 35%)'    // Forest green
     ]
     
     urlNames.forEach((urlName, index) => {
-      const color = monoColors[index % monoColors.length]
+      const color = distinctiveColors[index % distinctiveColors.length]
       config[`${urlName}_${metricType}`] = {
         label: urlName,
         color: color
@@ -627,9 +631,9 @@ export default function Dashboard() {
                           type="monotone"
                           dataKey={`${urlName}_performance`}
                           stroke={lineConfig?.color}
-                          strokeWidth={3}
-                          dot={{ r: 4 }}
-                          activeDot={{ r: 6 }}
+                          strokeWidth={4}
+                          dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                          activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
                           connectNulls={false}
                         />
                       )
@@ -682,9 +686,9 @@ export default function Dashboard() {
                             type="monotone"
                             dataKey={`${urlName}_lcp`}
                             stroke={lineConfig?.color}
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
+                            strokeWidth={4}
+                            dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
                             connectNulls={false}
                           />
                         )
@@ -735,9 +739,9 @@ export default function Dashboard() {
                             type="monotone"
                             dataKey={`${urlName}_fcp`}
                             stroke={lineConfig?.color}
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
+                            strokeWidth={4}
+                            dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
                             connectNulls={false}
                           />
                         )
