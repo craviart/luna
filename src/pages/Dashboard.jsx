@@ -44,6 +44,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '../components/ui/hover-card'
+import AIInsights from '../components/AIInsights'
 
 export default function Dashboard() {
   const [monitoredUrls, setMonitoredUrls] = useState([])
@@ -527,6 +528,13 @@ export default function Dashboard() {
             />
           </div>
         </div>
+
+        {/* AI Performance Insights */}
+        <AIInsights 
+          performanceData={monitoredUrls} 
+          timeRange={timeRange}
+          loading={loading}
+        />
 
         {/* Monitored Websites Cards */}
         {monitoredUrls.length > 0 && (
