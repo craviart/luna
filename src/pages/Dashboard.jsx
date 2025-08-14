@@ -326,8 +326,17 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     
     // Only animate when score actually changes, not on re-renders
     useEffect(() => {
+      console.log(`🎯 SpeedometerChart (${actualScore}) useEffect:`, {
+        hasInitialized: hasInitializedRef.current,
+        previousScore: previousScoreRef.current,
+        actualScore,
+        willAnimate: !hasInitializedRef.current || previousScoreRef.current !== actualScore
+      })
+      
       // Check if this is the first mount or if score has actually changed
       if (!hasInitializedRef.current || previousScoreRef.current !== actualScore) {
+        console.log(`🚀 Starting animation: ${actualScore}`)
+        
         // Only reset to 0 if this is not the initial mount with the same score
         if (hasInitializedRef.current) {
           setAnimatedScore(0) // Reset to 0 first for score changes
@@ -340,6 +349,8 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         }, hasInitializedRef.current ? 200 : 50) // Faster initial animation
         
         return () => clearTimeout(timer)
+      } else {
+        console.log(`⏭️ Skipping animation for ${actualScore} (no change)`)
       }
     }, [actualScore])
     
@@ -400,11 +411,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
           <div className="text-center">
             <div className="text-4xl font-bold">
-              <NumberFlow 
-                value={animatedScore} 
-                format={{ maximumFractionDigits: 0 }}
-                willChange
-              />
+              {Math.round(animatedScore)}
             </div>
             <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
           </div>
