@@ -47,7 +47,7 @@ export default function AIInsights({ cachedInsight, isGenerating, onRefresh, loa
               >
                 <AIWriter
                   key={animationKey}
-                  delay={25} // 25ms between characters for smooth typing
+                  delay={80} // 80ms between characters to match ChatGPT's natural pace
                   onFinish={() => {
                     console.log('AI insight typing completed')
                   }}
