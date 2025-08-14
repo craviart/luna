@@ -11,7 +11,8 @@ import {
   TestTube,
   Activity,
   Globe,
-  TrendingUp
+  TrendingUp,
+  Info
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -22,10 +23,14 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from '@/components/ui/chart'
 import {
   Line,
   LineChart,
+  AreaChart,
+  Area,
   CartesianGrid,
   ResponsiveContainer,
   XAxis,
@@ -38,6 +43,11 @@ import {
 } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../components/ui/hover-card'
 
 export default function Dashboard() {
   const [monitoredUrls, setMonitoredUrls] = useState([])
@@ -135,8 +145,8 @@ export default function Dashboard() {
   }
 
   // Colored Badge Component
-  const ColoredBadge = ({ value, color, children }) => (
-    <Badge variant="outline" className="flex items-center gap-1">
+  const ColoredBadge = ({ value, color, children, variant = "outline" }) => (
+    <Badge variant={variant} className={`flex items-center gap-1 ${variant === "ghost" ? "border-0" : ""}`}>
       <div 
         className="w-2 h-2 rounded-full" 
         style={{ backgroundColor: color }}
@@ -155,7 +165,7 @@ export default function Dashboard() {
   }
 
   // Speedometer Component using shadcn Radial Chart
-  const SpeedometerChart = ({ score }) => {
+  const SpeedometerChart = ({ score, analysisDate }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
     const actualScore = score || 0
     
@@ -190,6 +200,18 @@ export default function Dashboard() {
     
     const totalScore = animatedScore
     
+    // Format the analysis date
+    const formatAnalysisDate = (date) => {
+      if (!date) return 'No data'
+      const analysisDate = new Date(date)
+      return analysisDate.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+    
     return (
       <div className="mx-auto aspect-square max-h-[250px]">
         <ChartContainer
@@ -210,7 +232,7 @@ export default function Dashboard() {
         </ChartContainer>
         
         {/* Score text overlay - positioned in center */}
-        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-2">
+        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
           <div className="text-center">
             <div className="text-4xl font-bold">
               <NumberFlow 
@@ -219,7 +241,7 @@ export default function Dashboard() {
                 willChange
               />
             </div>
-            <div className="text-sm text-muted-foreground">Score</div>
+            <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
           </div>
         </div>
       </div>
@@ -276,23 +298,18 @@ export default function Dashboard() {
     }
   }
 
-  // Chart configurations for different metrics using improved mono theme
+  // Chart configurations for different metrics using blue theme colors
   const getChartConfig = (urlNames, metricType) => {
     const config = {}
-    // Improved mono theme: better contrast while maintaining professional look
-    const monoColors = [
-      'hsl(0, 0%, 15%)',    // Very dark gray - high contrast
-      'hsl(0, 0%, 35%)',    // Dark gray
-      'hsl(0, 0%, 55%)',    // Medium gray  
-      'hsl(0, 0%, 75%)',    // Light gray
-      'hsl(0, 0%, 90%)',    // Very light gray
-      'hsl(0, 0%, 25%)',    // Additional dark shade
-      'hsl(0, 0%, 45%)',    // Additional medium shade
-      'hsl(0, 0%, 65%)'     // Additional light shade
+    // Clear blue color differentiation: blue-200, blue-400, blue-600
+    const blueThemeColors = [
+      '#bfdbfe',   // blue-200 - lightest
+      '#60a5fa',   // blue-400 - medium  
+      '#2563eb',   // blue-600 - darkest
     ]
     
     urlNames.forEach((urlName, index) => {
-      const color = monoColors[index % monoColors.length]
+      const color = blueThemeColors[index % blueThemeColors.length]
       config[`${urlName}_${metricType}`] = {
         label: urlName,
         color: color
@@ -496,27 +513,29 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="max-w-7xl mx-auto w-full">
+    <div className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-6 sm:space-y-8">
         
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Performance overview and monitoring insights
             </p>
           </div>
-          <TimeRangeSelector 
-            value={timeRange} 
-            onValueChange={setTimeRange}
-          />
+          <div className="flex-shrink-0">
+            <TimeRangeSelector 
+              value={timeRange} 
+              onValueChange={setTimeRange}
+            />
+          </div>
         </div>
 
         {/* Monitored Websites Cards */}
         {monitoredUrls.length > 0 && (
-          <div className="mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {monitoredUrls.map((url) => (
                 <Card key={url.id} className="h-full">
                   <CardHeader className="pb-4">
@@ -534,21 +553,54 @@ export default function Dashboard() {
                       <>
                         {/* Performance Score - Speedometer */}
                         <div className="text-center py-2 bg-muted/50 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-2">Performance Score</div>
-                          <SpeedometerChart score={url.latestAnalysis.performance_score} />
+                          <div className="text-sm text-muted-foreground mb-1">Performance Score</div>
+                          <SpeedometerChart 
+                            score={url.latestAnalysis.performance_score} 
+                            analysisDate={url.latestAnalysis.created_at}
+                          />
                         </div>
                         
                         {/* Quick Metrics */}
-                        <div className="grid grid-cols-2 gap-4 text-sm flex-1">
+                        <div className="grid grid-cols-2 gap-4 text-lg flex-1">
                           <div className="space-y-1">
-                            <div className="text-muted-foreground">FCP</div>
-                            <ColoredBadge color={getFCPColor(url.latestAnalysis.fcp_time)}>
+                            <div className="text-muted-foreground text-sm flex items-center gap-1">
+                              FCP
+                              <HoverCard>
+                                <HoverCardTrigger asChild>
+                                  <Info className="h-3 w-3 cursor-help" />
+                                </HoverCardTrigger>
+                                <HoverCardContent className="w-80">
+                                  <div className="space-y-2">
+                                    <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                                    </p>
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                            </div>
+                            <ColoredBadge variant="ghost" color={getFCPColor(url.latestAnalysis.fcp_time)}>
                               {formatTime(url.latestAnalysis.fcp_time)}
                             </ColoredBadge>
                           </div>
                           <div className="space-y-1">
-                            <div className="text-muted-foreground">LCP</div>
-                            <ColoredBadge color={getLCPColor(url.latestAnalysis.lcp_time)}>
+                            <div className="text-muted-foreground text-sm flex items-center gap-1">
+                              LCP
+                              <HoverCard>
+                                <HoverCardTrigger asChild>
+                                  <Info className="h-3 w-3 cursor-help" />
+                                </HoverCardTrigger>
+                                <HoverCardContent className="w-80">
+                                  <div className="space-y-2">
+                                    <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                                    </p>
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                            </div>
+                            <ColoredBadge variant="ghost" color={getLCPColor(url.latestAnalysis.lcp_time)}>
                               {formatTime(url.latestAnalysis.lcp_time)}
                             </ColoredBadge>
                           </div>
@@ -616,6 +668,7 @@ export default function Dashboard() {
                       label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
                     {chartData.urlNames?.map((urlName, index) => {
                       const config = getChartConfig(chartData.urlNames, 'performance')
                       const lineConfig = config[`${urlName}_performance`]
@@ -626,9 +679,9 @@ export default function Dashboard() {
                           dataKey={`${urlName}_performance`}
                           stroke={lineConfig?.color}
                           strokeWidth={3}
-                          dot={{ r: 4 }}
-                          activeDot={{ r: 6 }}
                           connectNulls={false}
+                          dot={false}
+                          activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                         />
                       )
                     })}
@@ -642,8 +695,21 @@ export default function Dashboard() {
               {/* LCP Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     Largest Contentful Paint (LCP)
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     LCP performance for all monitored pages over the last 30 days
@@ -654,7 +720,7 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'lcp')} 
                     className="h-[350px] w-full"
                   >
-                    <LineChart data={chartData.data}>
+                                        <LineChart data={chartData.data}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="date" 
@@ -671,6 +737,7 @@ export default function Dashboard() {
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
                       {chartData.urlNames?.map((urlName, index) => {
                         const config = getChartConfig(chartData.urlNames, 'lcp')
                         const lineConfig = config[`${urlName}_lcp`]
@@ -681,9 +748,9 @@ export default function Dashboard() {
                             dataKey={`${urlName}_lcp`}
                             stroke={lineConfig?.color}
                             strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
                             connectNulls={false}
+                            dot={false}
+                            activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                           />
                         )
                       })}
@@ -695,8 +762,21 @@ export default function Dashboard() {
               {/* FCP Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     First Contentful Paint (FCP)
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     FCP performance for all monitored pages over the last 30 days
@@ -707,7 +787,7 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'fcp')} 
                     className="h-[350px] w-full"
                   >
-                    <LineChart data={chartData.data}>
+                                        <LineChart data={chartData.data}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="date" 
@@ -724,6 +804,7 @@ export default function Dashboard() {
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
                       {chartData.urlNames?.map((urlName, index) => {
                         const config = getChartConfig(chartData.urlNames, 'fcp')
                         const lineConfig = config[`${urlName}_fcp`]
@@ -734,9 +815,9 @@ export default function Dashboard() {
                             dataKey={`${urlName}_fcp`}
                             stroke={lineConfig?.color}
                             strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
                             connectNulls={false}
+                            dot={false}
+                            activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                           />
                         )
                       })}
@@ -755,54 +836,61 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold mb-6">Recent Test History</h2>
             <Card>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Website</TableHead>
-                      <TableHead>Performance</TableHead>
-                      <TableHead>FCP</TableHead>
-                      <TableHead>LCP</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-20">Type</TableHead>
+                        <TableHead className="min-w-48">Website</TableHead>
+                        <TableHead className="min-w-24">Performance</TableHead>
+                        <TableHead className="min-w-20">FCP</TableHead>
+                        <TableHead className="min-w-20">LCP</TableHead>
+                        <TableHead className="min-w-24">Date</TableHead>
+                        <TableHead className="min-w-24">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
                   <TableBody>
                     {allAnalyses.slice(0, 10).map((analysis) => (
                       <TableRow key={`${analysis.type}-${analysis.id}`}>
                         <TableCell>
-                          <Badge variant={analysis.type === 'monitored' ? 'default' : 'secondary'}>
+                          <Badge variant={analysis.type === 'monitored' ? 'outline' : 'secondary'}>
                             {analysis.type === 'monitored' ? 'Monitored' : 'Quick Test'}
                           </Badge>
                         </TableCell>
-                        <TableCell className="max-w-48 truncate">
+                        <TableCell className="max-w-48 truncate text-base">
                           {analysis.type === 'quick_test' 
                             ? cleanUrl(analysis.display_url) 
                             : cleanUrl(analysis.display_url) || 'Loading...'
                           }
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getPerformanceColor(analysis.performance_score)}>
-                            {analysis.performance_score ? (
-                              <NumberFlow 
-                                value={analysis.performance_score} 
-                                format={{ maximumFractionDigits: 0 }}
-                                suffix="/100"
-                                willChange
-                              />
-                            ) : (
-                              'N/A'
-                            )}
+                          <ColoredBadge variant="ghost" color={getPerformanceColor(analysis.performance_score)}>
+                            <span className="text-base">
+                              {analysis.performance_score ? (
+                                <NumberFlow 
+                                  value={analysis.performance_score} 
+                                  format={{ maximumFractionDigits: 0 }}
+                                  suffix="/100"
+                                  willChange
+                                />
+                              ) : (
+                                'N/A'
+                              )}
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getFCPColor(analysis.fcp_time)}>
-                            <AnimatedTime time={analysis.fcp_time} />
+                          <ColoredBadge variant="ghost" color={getFCPColor(analysis.fcp_time)}>
+                            <span className="text-base">
+                              <AnimatedTime time={analysis.fcp_time} />
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getLCPColor(analysis.lcp_time)}>
-                            <AnimatedTime time={analysis.lcp_time} />
+                          <ColoredBadge variant="ghost" color={getLCPColor(analysis.lcp_time)}>
+                            <span className="text-base">
+                              <AnimatedTime time={analysis.lcp_time} />
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
@@ -829,7 +917,8 @@ export default function Dashboard() {
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -837,12 +926,12 @@ export default function Dashboard() {
 
         {/* Navigation Cards - Show when no dashboard URLs */}
         {monitoredUrls.length === 0 && (
-          <div className="mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <LinkIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <CardTitle className="mb-2">Monitored Pages</CardTitle>
+                <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
+                  <LinkIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 text-muted-foreground" />
+                  <CardTitle className="mb-2 text-lg sm:text-xl">Monitored Pages</CardTitle>
                   <CardDescription className="mb-4">
                     Add websites for continuous monitoring and automatic daily analysis.
                   </CardDescription>
@@ -855,9 +944,9 @@ export default function Dashboard() {
               </Card>
               
               <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <Zap className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <CardTitle className="mb-2">Quick Testing</CardTitle>
+                <CardContent className="p-4 sm:p-6 lg:p-8 text-center">
+                  <Zap className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4 text-muted-foreground" />
+                  <CardTitle className="mb-2 text-lg sm:text-xl">Quick Testing</CardTitle>
                   <CardDescription className="mb-4">
                     Run one-time performance analysis on any website instantly.
                   </CardDescription>
