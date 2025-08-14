@@ -74,19 +74,19 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
 
   return (
     <Card className="relative overflow-hidden">
-      <CardContent className="p-6 flex items-center justify-center min-h-[244px] sm:min-h-[180px]">
-        <div className="w-full flex items-center justify-center">
+      <CardContent className="p-6 min-h-[244px] sm:min-h-[180px] flex flex-col justify-center">
+        <div className="w-full">
           {isGenerating ? (
-            <BlackLoader />
+            <div className="flex items-center justify-center h-full">
+              <BlackLoader />
+            </div>
           ) : currentInsight ? (
             <div 
+              className="text-[20px] leading-[1.5] sm:text-[32px] sm:leading-[1.4]"
               style={{
-                fontSize: '20px', // Mobile: 20px
-                lineHeight: '1.5', // Mobile: 1.5
                 color: 'hsl(var(--foreground))',
                 fontWeight: '400'
               }}
-              className="sm:text-[32px] sm:leading-[1.4]"
             >
               <AIWriter
                 key={`insight-${animationKey}-${currentInsight.length}`}
