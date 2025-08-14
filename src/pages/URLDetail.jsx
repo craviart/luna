@@ -10,7 +10,8 @@ import {
   Minus,
   BarChart3,
   Loader2,
-  Info
+  Info,
+  Zap
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
