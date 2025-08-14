@@ -6,7 +6,8 @@ import {
   LogOut,
   Zap,
   Target,
-  Monitor
+  Monitor,
+  FileSearch
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useState } from "react"
@@ -83,8 +84,8 @@ const catBehaviors = [
   "gentle nudge"
 ]
 
-// Menu items for the Luna Analytics dashboard - Main section
-const menuItems = [
+// Menu items for the Luna Analytics dashboard - Monitoring section
+const monitoringItems = [
   {
     title: "Dashboard",
     url: "/",
@@ -96,9 +97,11 @@ const menuItems = [
     icon: Activity,
   },
   {
-    title: "Quick Testing",
-    url: "/quick-testing",
-    icon: Zap,
+    title: "Code Coverage",
+    url: "/code-coverage",
+    icon: FileSearch,
+    disabled: true,
+    tooltip: "Coming soon",
   },
   {
     title: "Snapshots",
@@ -115,6 +118,15 @@ const performanceItems = [
     title: "API Monitoring",
     url: "/api-monitoring",
     icon: Monitor,
+  },
+]
+
+// Tools section items
+const toolsItems = [
+  {
+    title: "Quick Testing",
+    url: "/quick-testing",
+    icon: Zap,
   },
 ]
 
@@ -181,7 +193,46 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <TooltipProvider>
-                {menuItems.map((item) => (
+                {monitoringItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    {item.disabled ? (
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <div className="opacity-50 cursor-not-allowed">
+                            <SidebarMenuButton 
+                              disabled
+                              className="pointer-events-none"
+                            >
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </SidebarMenuButton>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{item.tooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                        <Link to={item.url} onClick={handleNavigationClick}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                ))}
+              </TooltipProvider>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Tools</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <TooltipProvider>
+                {toolsItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     {item.disabled ? (
                       <Tooltip delayDuration={0}>
