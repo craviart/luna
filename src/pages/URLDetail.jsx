@@ -796,13 +796,7 @@ export default function URLDetail() {
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData}>
-                      <defs>
-                        <linearGradient id="fcpGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
+                      <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -829,17 +823,15 @@ export default function URLDetail() {
                         ]}
                       />
                       <ChartLegend content={<ChartLegendContent />} />
-                      <Area
+                      <Line
                         type="monotone"
                         dataKey="fcp_time"
                         stroke="hsl(221, 83%, 53%)"
-                        strokeWidth={2}
-                        fill="url(#fcpGradient)"
-                        fillOpacity={0.4}
+                        strokeWidth={3}
                         dot={false}
-                        activeDot={{ r: 4, fill: "hsl(221, 83%, 53%)", stroke: "hsl(221, 83%, 53%)" }}
+                        activeDot={{ r: 6, fill: "hsl(221, 83%, 53%)", stroke: "#fff", strokeWidth: 2 }}
                       />
-                      </AreaChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
@@ -866,13 +858,7 @@ export default function URLDetail() {
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData}>
-                      <defs>
-                        <linearGradient id="lcpGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
+                      <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -899,17 +885,15 @@ export default function URLDetail() {
                         ]}
                       />
                       <ChartLegend content={<ChartLegendContent />} />
-                      <Area
+                      <Line
                         type="monotone"
                         dataKey="lcp_time"
                         stroke="hsl(212, 95%, 68%)"
-                        strokeWidth={2}
-                        fill="url(#lcpGradient)"
-                        fillOpacity={0.4}
+                        strokeWidth={3}
                         dot={false}
-                        activeDot={{ r: 4, fill: "hsl(212, 95%, 68%)", stroke: "hsl(212, 95%, 68%)" }}
+                        activeDot={{ r: 6, fill: "hsl(212, 95%, 68%)", stroke: "#fff", strokeWidth: 2 }}
                       />
-                      </AreaChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
@@ -936,13 +920,7 @@ export default function URLDetail() {
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData}>
-                      <defs>
-                        <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
+                      <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -970,17 +948,15 @@ export default function URLDetail() {
                         ]}
                       />
                       <ChartLegend content={<ChartLegendContent />} />
-                      <Area
+                      <Line
                         type="monotone"
                         dataKey="performance_score"
                         stroke="hsl(216, 87%, 45%)"
-                        strokeWidth={2}
-                        fill="url(#performanceGradient)"
-                        fillOpacity={0.4}
+                        strokeWidth={3}
                         dot={false}
-                        activeDot={{ r: 4, fill: "hsl(216, 87%, 45%)", stroke: "hsl(216, 87%, 45%)" }}
+                        activeDot={{ r: 6, fill: "hsl(216, 87%, 45%)", stroke: "#fff", strokeWidth: 2 }}
                       />
-                      </AreaChart>
+                      </LineChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
