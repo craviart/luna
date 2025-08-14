@@ -83,7 +83,7 @@ const catBehaviors = [
   "gentle nudge"
 ]
 
-// Menu items for the Luna Analytics dashboard
+// Menu items for the Luna Analytics dashboard - Main section
 const menuItems = [
   {
     title: "Dashboard",
@@ -101,17 +101,21 @@ const menuItems = [
     icon: Zap,
   },
   {
+    title: "Snapshots",
+    url: "/snapshots",
+    icon: Camera,
+    disabled: true,
+    tooltip: "Coming soon",
+  },
+]
+
+// Performance section items
+const performanceItems = [
+  {
     title: "API Monitoring",
     url: "/api-monitoring",
     icon: Monitor,
   },
-          {
-          title: "Snapshots",
-          url: "/snapshots",
-          icon: Camera,
-          disabled: true,
-          tooltip: "Coming soon",
-        },
 ]
 
 export function AppSidebar() {
@@ -214,13 +218,48 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Performance</SidebarGroupLabel>
           <SidebarGroupContent>
-            <div className="px-3 py-2 text-xs text-muted-foreground">
+            <SidebarMenu>
+              <TooltipProvider>
+                {performanceItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    {item.disabled ? (
+                      <Tooltip delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <div className="opacity-50 cursor-not-allowed">
+                            <SidebarMenuButton 
+                              disabled
+                              className="pointer-events-none"
+                            >
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </SidebarMenuButton>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{item.tooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                        <Link to={item.url} onClick={handleNavigationClick}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                ))}
+              </TooltipProvider>
+            </SidebarMenu>
+            
+            {/* Version Info */}
+            <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border/50 mt-2">
               <div className="flex items-center gap-2 mb-1">
                 <Target className="h-3 w-3" />
-                <span>Mobile 4G Analysis</span>
+                <span>Version v0.1.0-beta</span>
               </div>
               <div className="text-[10px] text-muted-foreground/70">
-                Real Chrome DevTools metrics
+                Enhanced charts & thresholds
               </div>
             </div>
           </SidebarGroupContent>
