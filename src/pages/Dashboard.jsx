@@ -40,7 +40,8 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  ReferenceArea
+  ReferenceArea,
+  ReferenceLine
 } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
@@ -668,10 +669,9 @@ export default function Dashboard() {
                       fontSize={12}
                       label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
                     />
-                    {/* Performance Score Threshold Zones */}
-                    <ReferenceArea y1={0} y2={50} fill="#ef4444" fillOpacity={0.1} />
-                    <ReferenceArea y1={50} y2={90} fill="#f59e0b" fillOpacity={0.1} />
-                    <ReferenceArea y1={90} y2={100} fill="#22c55e" fillOpacity={0.1} />
+                    {/* Performance Score Threshold Lines */}
+                    <ReferenceLine y={50} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.6} />
+                    <ReferenceLine y={90} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={0.6} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
                                           {chartData.urlNames?.map((urlName, index) => {
@@ -741,10 +741,9 @@ export default function Dashboard() {
                         fontSize={12}
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
-                      {/* LCP Threshold Zones */}
-                      <ReferenceArea y1={0} y2={2500} fill="#22c55e" fillOpacity={0.1} />
-                      <ReferenceArea y1={2500} y2={4000} fill="#f59e0b" fillOpacity={0.1} />
-                      <ReferenceArea y1={4000} y2={10000} fill="#ef4444" fillOpacity={0.1} />
+                      {/* LCP Threshold Lines */}
+                      <ReferenceLine y={2500} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={0.6} />
+                      <ReferenceLine y={4000} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.6} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
                                               {chartData.urlNames?.map((urlName, index) => {
@@ -812,10 +811,9 @@ export default function Dashboard() {
                         fontSize={12}
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
-                      {/* FCP Threshold Zones */}
-                      <ReferenceArea y1={0} y2={1800} fill="#22c55e" fillOpacity={0.1} />
-                      <ReferenceArea y1={1800} y2={3000} fill="#f59e0b" fillOpacity={0.1} />
-                      <ReferenceArea y1={3000} y2={8000} fill="#ef4444" fillOpacity={0.1} />
+                      {/* FCP Threshold Lines */}
+                      <ReferenceLine y={1800} stroke="#22c55e" strokeDasharray="3 3" strokeOpacity={0.6} />
+                      <ReferenceLine y={3000} stroke="#f59e0b" strokeDasharray="3 3" strokeOpacity={0.6} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
                                               {chartData.urlNames?.map((urlName, index) => {
