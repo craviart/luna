@@ -188,7 +188,9 @@ export default function Dashboard() {
       const avgFCP = Math.round(sites.reduce((sum, s) => sum + s.fcp, 0) / sites.length)
       const avgLCP = Math.round(sites.reduce((sum, s) => sum + s.lcp, 0) / sites.length)
 
-      const prompt = `Analyze this website performance data and provide 1-2 sentences of actionable insight in a professional but conversational tone:
+      const prompt = `You are a front-end developer and web performance expert working for an ecommerce website. You're responsible for helping people understand how performance directly impacts conversion rates and business success. As an engineer, provide precise technical insights while emphasizing business impact.
+
+Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes:
 
 SITES PERFORMANCE:
 ${sites.map(site => 
@@ -203,7 +205,7 @@ SUMMARY:
 • Average FCP: ${avgFCP}ms
 • Average LCP: ${avgLCP}ms
 
-Focus on the most important insight: overall health, concerning trends, specific recommendations, or notable achievements. Be concise and actionable.`
+Focus on: How these metrics affect conversion rates, user experience, and revenue. Be technically precise but emphasize business impact. Mention specific performance thresholds that matter for ecommerce (FCP <1.8s, LCP <2.5s for good conversion rates).`
 
       // Call AI API
       const response = await fetch('/api/ai-insights', {
@@ -233,23 +235,27 @@ Focus on the most important insight: overall health, concerning trends, specific
     }
   }
 
-  // Generate fallback insight
+  // Generate fallback insight with ecommerce performance focus
   const generateFallbackInsight = (urlsData) => {
     const sites = urlsData.filter(url => url.latestAnalysis?.performance_score > 0)
     if (sites.length === 0) {
-      return "Add some monitored websites to get performance insights and recommendations."
+      return "Add monitored pages to track how performance impacts your conversion rates and revenue."
     }
 
     const avgScore = Math.round(sites.reduce((sum, s) => sum + s.latestAnalysis.performance_score, 0) / sites.length)
     const poorSites = sites.filter(s => s.latestAnalysis.performance_score < 50).length
     const goodSites = sites.filter(s => s.latestAnalysis.performance_score >= 90).length
+    const avgFCP = Math.round(sites.reduce((sum, s) => sum + (s.latestAnalysis?.fcp_time || 0), 0) / sites.length)
+    const avgLCP = Math.round(sites.reduce((sum, s) => sum + (s.latestAnalysis?.lcp_time || 0), 0) / sites.length)
 
-    if (avgScore >= 80) {
-      return `Your sites are performing well with an average score of ${avgScore}/100. ${goodSites > 0 ? `${goodSites} site${goodSites > 1 ? 's' : ''} scored 90+!` : 'Keep up the great work!'}`
+    if (avgScore >= 80 && avgFCP <= 1800 && avgLCP <= 2500) {
+      return `Excellent performance! Your ${avgScore}/100 average score with FCP under 1.8s optimizes for maximum conversion rates.`
     } else if (poorSites > 0) {
-      return `${poorSites} site${poorSites > 1 ? 's need' : ' needs'} attention with scores below 50. Focus on optimizing images, reducing JavaScript, and improving server response times.`
+      return `${poorSites} page${poorSites > 1 ? 's have' : ' has'} scores below 50, potentially reducing conversion rates by up to 20%. Prioritize Core Web Vitals optimization.`
+    } else if (avgFCP > 1800 || avgLCP > 2500) {
+      return `FCP at ${(avgFCP/1000).toFixed(1)}s or LCP at ${(avgLCP/1000).toFixed(1)}s may impact conversion rates. Target FCP <1.8s and LCP <2.5s for optimal ecommerce performance.`
     } else {
-      return `Average performance score is ${avgScore}/100. Consider optimizing Core Web Vitals to improve user experience and SEO rankings.`
+      return `${avgScore}/100 performance score indicates room for conversion rate optimization through faster Core Web Vitals.`
     }
   }
 
