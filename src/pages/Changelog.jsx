@@ -72,6 +72,46 @@ export default function Changelog() {
         {/* Changelog Entries */}
         <div className="space-y-8">
           <ChangelogEntry
+            version="v0.4.0-beta"
+            date="August 14, 2025"
+            title="Changelog Page & Admin Sidebar Updates"
+            description="Professional changelog documentation and improved admin navigation with GitHub repository access."
+          >
+            <ChangeSection
+              title="New Features"
+              items={[
+                "Comprehensive changelog page inspired by Linear's design",
+                "GitHub repository link in Admin sidebar (opens in new tab)",
+                "Professional release documentation with categorized sections",
+                "Clean, icon-free changelog layout for better content focus",
+                "Real commit dates from git history for authentic timeline"
+              ]}
+            />
+
+            <ChangeSection
+              title="Admin Section Improvements"
+              items={[
+                "Renamed 'Performance' section to 'Admin' for better clarity",
+                "Added GitHub Repo link with external link handling",
+                "Secure external link implementation (target='_blank' with rel='noopener')",
+                "Smart link rendering: external links use <a> tag, internal use <Link>",
+                "Maintained permission system for API Monitoring access"
+              ]}
+            />
+
+            <ChangeSection
+              title="Documentation Enhancements"
+              items={[
+                "Detailed release history from v0.1.0-beta to current version",
+                "Categorized changelog sections (Features, Improvements, Fixes, Security)",
+                "Professional footer and clean navigation integration",
+                "Accessible via 'View changelog' link below version number",
+                "Consistent with Luna Analytics design system and branding"
+              ]}
+            />
+          </ChangelogEntry>
+
+          <ChangelogEntry
             version="v0.3.0-beta"
             date="August 14, 2025"
             title="Role-based Access Control & Critical Bug Fixes"
