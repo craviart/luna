@@ -86,7 +86,7 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
                 color: 'hsl(var(--foreground))',
                 fontWeight: '400'
               }}
-              className="sm:text-[32px] sm:leading-[1.4] text-center"
+              className="sm:text-[32px] sm:leading-[1.4]"
             >
               <AIWriter
                 key={`insight-${animationKey}-${currentInsight.length}`}
