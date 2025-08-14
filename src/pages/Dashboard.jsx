@@ -237,12 +237,49 @@ SUMMARY:
 
 Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wording and structure than any previous response. Be technically precise but emphasize business impact.`
 
-      // Call AI API
-      const response = await fetch('/api/ai-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      })
+      // Call AI API with retry logic for rate limits
+      let response
+      let lastError
+      const maxRetries = 3
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`AI API attempt ${attempt}/${maxRetries}`)
+          
+          response = await fetch('/api/ai-insights', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+          })
+          
+          // If successful or non-rate-limit error, break
+          if (response.ok || response.status !== 429) {
+            break
+          }
+          
+          // If rate limited, wait before retry
+          if (response.status === 429 && attempt < maxRetries) {
+            const waitTime = Math.pow(2, attempt) * 1000 // Exponential backoff: 2s, 4s, 8s
+            console.log(`Rate limited, waiting ${waitTime}ms before retry...`)
+            await new Promise(resolve => setTimeout(resolve, waitTime))
+            continue
+          }
+          
+        } catch (error) {
+          lastError = error
+          if (attempt < maxRetries) {
+            const waitTime = Math.pow(2, attempt) * 1000
+            console.log(`Network error, waiting ${waitTime}ms before retry...`)
+            await new Promise(resolve => setTimeout(resolve, waitTime))
+            continue
+          }
+        }
+      }
+
+      // Handle case where all retries failed
+      if (!response) {
+        throw lastError || new Error('Failed to connect to AI service after retries')
+      }
 
       if (response.ok) {
         const result = await response.json()
@@ -271,6 +308,8 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         setCachedInsight("🔧 AI insights need configuration. Please add the GEMINI_API_KEY environment variable in Vercel.")
       } else if (error.message.includes('not configured')) {
         setCachedInsight("🔧 AI insights need configuration. Please add the GEMINI_API_KEY environment variable in Vercel.")
+      } else if (error.message.includes('rate limit exceeded')) {
+        setCachedInsight("⏱️ AI insights are rate limited. Refresh in a few moments for fresh insights from your performance data.")
       } else {
         // Simple fallback without excessive variations
         setCachedInsight("Performance insights are temporarily unavailable. Your current metrics show areas for ecommerce optimization.")
@@ -611,7 +650,10 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
 
       // Generate AI insights when data is loaded (only if we have sites with data)
       if (processedUrls.length > 0) {
-        generateAIInsight(processedUrls)
+        // Add delay to avoid rate limiting on dashboard load
+        setTimeout(() => {
+          generateAIInsight(processedUrls)
+        }, 2000) // 2 second delay
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error)
