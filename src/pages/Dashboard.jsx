@@ -323,32 +323,10 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     const hasAnimatedRef = useRef(new Set()) // Track which scores we've animated
     const actualScore = score || 0
     
-    // Only animate when we haven't animated this score before
+    // NUCLEAR TEST: No animation at all - just set the score directly
     useEffect(() => {
-      const hasAnimated = hasAnimatedRef.current.has(actualScore)
-      
-      console.log(`🎯 SpeedometerChart (${actualScore}) useEffect:`, {
-        actualScore,
-        hasAnimated,
-        animatedScores: Array.from(hasAnimatedRef.current),
-        willAnimate: !hasAnimated
-      })
-      
-      // Only animate if we haven't animated this exact score before
-      if (!hasAnimated) {
-        console.log(`🚀 Starting animation: ${actualScore}`)
-        hasAnimatedRef.current.add(actualScore) // Mark this score as animated
-        
-        // Start from 0 and animate to actual score
-        setAnimatedScore(0)
-        const timer = setTimeout(() => {
-          setAnimatedScore(actualScore)
-        }, 100)
-        
-        return () => clearTimeout(timer)
-      } else {
-        console.log(`⏭️ Skipping animation for ${actualScore} (already animated)`)
-      }
+      console.log(`🎯 SpeedometerChart (${actualScore}) - SETTING SCORE DIRECTLY (NO ANIMATION)`)
+      setAnimatedScore(actualScore) // Just set it directly, no animation
     }, [actualScore])
     
     // Chart data - desktop shows the score, mobile shows the remaining portion
@@ -397,10 +375,11 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
             endAngle={0}
             innerRadius={80}
             outerRadius={140}
+            isAnimationActive={false}
           >
             <PolarRadiusAxis tick={false} tickCount={3} axisLine={false} />
-            <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" />
-            <RadialBar dataKey="mobile" fill="hsl(var(--muted))" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
+            <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" isAnimationActive={false} />
+            <RadialBar dataKey="mobile" fill="hsl(var(--muted))" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" isAnimationActive={false} />
           </RadialBarChart>
         </ChartContainer>
         
