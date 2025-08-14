@@ -608,7 +608,7 @@ export default function Dashboard() {
                   config={getChartConfig(chartData.urlNames, 'performance')} 
                   className="h-[400px] w-full"
                 >
-                  <AreaChart data={chartData.data}>
+                  <LineChart data={chartData.data}>
                     <defs>
                       {chartData.urlNames?.map((urlName, index) => {
                         const config = getChartConfig(chartData.urlNames, 'performance')
@@ -616,8 +616,8 @@ export default function Dashboard() {
                         const gradientId = `gradient-${urlName}-performance`
                         return (
                           <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.05} />
                           </linearGradient>
                         )
                       })}
@@ -645,21 +645,20 @@ export default function Dashboard() {
                       const areaConfig = config[`${urlName}_performance`]
                       const gradientId = `gradient-${urlName}-performance`
                       return (
-                        <Area
+                        <Line
                           key={urlName}
                           type="monotone"
                           dataKey={`${urlName}_performance`}
                           stroke={areaConfig?.color}
-                          strokeWidth={2}
+                          strokeWidth={3}
                           fill={`url(#${gradientId})`}
-                          fillOpacity={0.4}
                           connectNulls={false}
                           dot={false}
-                          activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
+                          activeDot={{ r: 6, fill: areaConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                         />
                       )
                     })}
-                  </AreaChart>
+                  </LineChart>
                 </ChartContainer>
               </CardContent>
             </Card>
@@ -681,7 +680,7 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'lcp')} 
                     className="h-[350px] w-full"
                   >
-                    <AreaChart data={chartData.data}>
+                    <LineChart data={chartData.data}>
                       <defs>
                         {chartData.urlNames?.map((urlName, index) => {
                           const config = getChartConfig(chartData.urlNames, 'lcp')
@@ -689,8 +688,8 @@ export default function Dashboard() {
                           const gradientId = `gradient-${urlName}-lcp`
                           return (
                             <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.05} />
                             </linearGradient>
                           )
                         })}
@@ -717,21 +716,20 @@ export default function Dashboard() {
                         const areaConfig = config[`${urlName}_lcp`]
                         const gradientId = `gradient-${urlName}-lcp`
                         return (
-                          <Area
+                          <Line
                             key={urlName}
                             type="monotone"
                             dataKey={`${urlName}_lcp`}
                             stroke={areaConfig?.color}
-                            strokeWidth={2}
+                            strokeWidth={3}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.4}
                             connectNulls={false}
                             dot={false}
-                            activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
+                            activeDot={{ r: 6, fill: areaConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                           />
                         )
                       })}
-                    </AreaChart>
+                    </LineChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
@@ -751,7 +749,7 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'fcp')} 
                     className="h-[350px] w-full"
                   >
-                    <AreaChart data={chartData.data}>
+                    <LineChart data={chartData.data}>
                       <defs>
                         {chartData.urlNames?.map((urlName, index) => {
                           const config = getChartConfig(chartData.urlNames, 'fcp')
@@ -759,8 +757,8 @@ export default function Dashboard() {
                           const gradientId = `gradient-${urlName}-fcp`
                           return (
                             <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.05} />
                             </linearGradient>
                           )
                         })}
@@ -787,21 +785,20 @@ export default function Dashboard() {
                         const areaConfig = config[`${urlName}_fcp`]
                         const gradientId = `gradient-${urlName}-fcp`
                         return (
-                          <Area
+                          <Line
                             key={urlName}
                             type="monotone"
                             dataKey={`${urlName}_fcp`}
                             stroke={areaConfig?.color}
-                            strokeWidth={2}
+                            strokeWidth={3}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.4}
                             connectNulls={false}
                             dot={false}
-                            activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
+                            activeDot={{ r: 6, fill: areaConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                           />
                         )
                       })}
-                    </AreaChart>
+                    </LineChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
