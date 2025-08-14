@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { Badge } from './ui/badge'
-import { Sparkles, AlertCircle, RefreshCw } from 'lucide-react'
+import { Card, CardContent } from './ui/card'
+import { TypeAnimation } from 'react-type-animation'
+import { RefreshCw } from 'lucide-react'
 import { Button } from './ui/button'
 
 export default function AIInsights({ performanceData, timeRange, loading }) {
@@ -9,6 +9,7 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState(null)
   const [lastGenerated, setLastGenerated] = useState(null)
+  const [animationKey, setAnimationKey] = useState(0)
 
   // Generate insight when performance data changes
   useEffect(() => {
@@ -56,6 +57,8 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
       if (result.success && result.insight) {
         setInsight(result.insight)
         setLastGenerated(Date.now())
+        // Force re-render of TypeAnimation by changing key
+        setAnimationKey(prev => prev + 1)
       } else {
         throw new Error(result.error || 'Failed to generate insight')
       }
@@ -65,6 +68,8 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
       setError(err.message)
       // Fallback to rule-based insight
       setInsight(generateFallbackInsight(performanceData))
+      // Force re-render of TypeAnimation for fallback
+      setAnimationKey(prev => prev + 1)
     } finally {
       setIsGenerating(false)
     }
@@ -150,77 +155,49 @@ Focus on the most important insight: overall health, concerning trends, specific
     generateInsight(true)
   }
 
-  if (loading) {
-    return (
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-lg">AI Performance Insights</CardTitle>
-            <Badge variant="secondary" className="text-xs">Powered by Gemini</Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            <span className="text-sm">Analyzing performance data...</span>
-          </div>
-        </CardContent>
-      </Card>
-    )
+  // Don't render anything while loading
+  if (loading || (!insight && !isGenerating)) {
+    return null
   }
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-r from-blue-50/50 to-purple-50/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-lg">AI Performance Insights</CardTitle>
-            <Badge variant="secondary" className="text-xs">Powered by Gemini</Badge>
+    <Card className="relative overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            {isGenerating ? (
+              <div className="flex items-center gap-3">
+                <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground flex-shrink-0" />
+                <span className="text-base text-muted-foreground">Generating insights...</span>
+              </div>
+            ) : insight ? (
+              <TypeAnimation
+                key={animationKey}
+                sequence={[insight]}
+                wrapper="div"
+                cursor={false}
+                speed={75}
+                style={{
+                  fontSize: '24px',
+                  lineHeight: '1.4',
+                  color: 'hsl(var(--foreground))',
+                  fontWeight: '400'
+                }}
+                className="sm:text-2xl text-xl leading-relaxed"
+              />
+            ) : null}
           </div>
+          
           <Button
             variant="ghost"
             size="sm"
             onClick={handleRefresh}
             disabled={isGenerating}
-            className="h-8 w-8 p-0"
+            className="h-9 w-9 p-0 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
           >
             <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
           </Button>
         </div>
-        <CardDescription>
-          AI-powered analysis of your website performance trends
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {error ? (
-          <div className="flex items-start gap-2 text-amber-600">
-            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <div className="text-sm">
-              <p className="font-medium mb-1">AI insights temporarily unavailable</p>
-              <p className="text-xs text-muted-foreground">{insight}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {isGenerating ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Generating insights...</span>
-              </div>
-            ) : (
-              <p className="text-sm leading-relaxed text-foreground">
-                {insight || "Analyzing your performance data..."}
-              </p>
-            )}
-            {lastGenerated && (
-              <p className="text-xs text-muted-foreground">
-                Generated {new Date(lastGenerated).toLocaleTimeString()}
-              </p>
-            )}
-          </div>
-        )}
       </CardContent>
     </Card>
   )
