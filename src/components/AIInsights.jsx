@@ -1,55 +1,55 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from './ui/card'
 import AIWriter from 'react-aiwriter'
 
 // Black animated loader component
 const BlackLoader = () => (
-  <div className="loader-container">
-    <div className="loader">
-      <div className="loader-dot"></div>
-      <div className="loader-dot"></div>
-      <div className="loader-dot"></div>
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '120px',
+    width: '100%'
+  }}>
+    <div style={{
+      display: 'flex',
+      gap: '8px',
+      alignItems: 'center'
+    }}>
+      <div style={{
+        width: '12px',
+        height: '12px',
+        backgroundColor: '#000',
+        borderRadius: '50%',
+        animation: 'bounce1 1.4s ease-in-out infinite both'
+      }}></div>
+      <div style={{
+        width: '12px',
+        height: '12px',
+        backgroundColor: '#000',
+        borderRadius: '50%',
+        animation: 'bounce2 1.4s ease-in-out infinite both'
+      }}></div>
+      <div style={{
+        width: '12px',
+        height: '12px',
+        backgroundColor: '#000',
+        borderRadius: '50%',
+        animation: 'bounce3 1.4s ease-in-out infinite both'
+      }}></div>
     </div>
-    <style jsx>{`
-      .loader-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 120px;
-        width: 100%;
+    <style>{`
+      @keyframes bounce1 {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
       }
-      
-      .loader {
-        display: flex;
-        gap: 8px;
-        align-items: center;
+      @keyframes bounce2 {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        24% { transform: scale(1); opacity: 1; }
       }
-      
-      .loader-dot {
-        width: 12px;
-        height: 12px;
-        background-color: #000;
-        border-radius: 50%;
-        animation: bounce 1.4s ease-in-out infinite both;
-      }
-      
-      .loader-dot:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-      
-      .loader-dot:nth-child(2) {
-        animation-delay: -0.16s;
-      }
-      
-      @keyframes bounce {
-        0%, 80%, 100% {
-          transform: scale(0);
-          opacity: 0.5;
-        }
-        40% {
-          transform: scale(1);
-          opacity: 1;
-        }
+      @keyframes bounce3 {
+        0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+        8% { transform: scale(1); opacity: 1; }
       }
     `}</style>
   </div>
@@ -77,7 +77,7 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
       <CardContent className="p-6">
         {isGenerating ? (
           <BlackLoader />
-        ) : cachedInsight ? (
+        ) : currentInsight ? (
           <div 
             style={{
               fontSize: '32px',
@@ -87,17 +87,12 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
             }}
             className="sm:text-3xl text-2xl leading-relaxed"
           >
-            {useMemo(() => (
-              <AIWriter
-                key={`insight-${animationKey}`}
-                delay={80} // 80ms between characters to match ChatGPT's natural pace
-                onFinish={() => {
-                  console.log('AI insight typing completed')
-                }}
-              >
-                <span>{currentInsight}</span>
-              </AIWriter>
-            ), [animationKey, currentInsight])}
+            <AIWriter
+              key={`insight-${animationKey}-${currentInsight.length}`}
+              delay={80}
+            >
+              <span>{currentInsight}</span>
+            </AIWriter>
           </div>
         ) : null}
       </CardContent>
