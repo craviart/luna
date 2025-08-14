@@ -2,24 +2,8 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Separator } from '../components/ui/separator'
-import { Clock, CheckCircle, Bug, Sparkles, Shield, Zap } from 'lucide-react'
 
 const ChangelogEntry = ({ version, date, title, description, type = 'feature', children }) => {
-  const getTypeIcon = () => {
-    switch (type) {
-      case 'feature':
-        return <Sparkles className="h-4 w-4" />
-      case 'improvement':
-        return <CheckCircle className="h-4 w-4" />
-      case 'fix':
-        return <Bug className="h-4 w-4" />
-      case 'security':
-        return <Shield className="h-4 w-4" />
-      default:
-        return <Zap className="h-4 w-4" />
-    }
-  }
-
   const getTypeColor = () => {
     switch (type) {
       case 'feature':
@@ -35,11 +19,25 @@ const ChangelogEntry = ({ version, date, title, description, type = 'feature', c
     }
   }
 
+  const getTypeLabel = () => {
+    switch (type) {
+      case 'feature':
+        return 'Feature'
+      case 'improvement':
+        return 'Improvement'
+      case 'fix':
+        return 'Fix'
+      case 'security':
+        return 'Security'
+      default:
+        return 'Update'
+    }
+  }
+
   return (
     <div className="mb-8">
       <div className="flex items-center gap-3 mb-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4" />
+        <div className="text-sm text-muted-foreground">
           {date}
         </div>
         {version && (
@@ -47,23 +45,19 @@ const ChangelogEntry = ({ version, date, title, description, type = 'feature', c
             {version}
           </Badge>
         )}
+        <Badge className={getTypeColor()}>
+          {getTypeLabel()}
+        </Badge>
       </div>
 
       <Card>
         <CardHeader className="pb-4">
-          <div className="flex items-start gap-3">
-            <div className={`p-2 rounded-lg border ${getTypeColor()}`}>
-              {getTypeIcon()}
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-xl mb-2">{title}</CardTitle>
-              {description && (
-                <CardDescription className="text-base leading-relaxed">
-                  {description}
-                </CardDescription>
-              )}
-            </div>
-          </div>
+          <CardTitle className="text-xl mb-2">{title}</CardTitle>
+          {description && (
+            <CardDescription className="text-base leading-relaxed">
+              {description}
+            </CardDescription>
+          )}
         </CardHeader>
         {children && (
           <CardContent className="pt-0">
@@ -76,12 +70,11 @@ const ChangelogEntry = ({ version, date, title, description, type = 'feature', c
   )
 }
 
-const ChangeSection = ({ title, items, icon }) => (
+const ChangeSection = ({ title, items }) => (
   <div className="mb-6">
     <div className="flex items-center gap-2 mb-3">
-      {icon}
       <h4 className="font-semibold text-foreground">{title}</h4>
-      <Badge variant="secondary" className="ml-1">
+      <Badge variant="secondary">
         {items.length}
       </Badge>
     </div>
@@ -119,7 +112,6 @@ export default function Changelog() {
           >
             <ChangeSection
               title="New Features"
-              icon={<Sparkles className="h-4 w-4 text-blue-600" />}
               items={[
                 "Role-based Access Control (RBAC) system with Admin and Viewer profiles",
                 "Admin profile (PIN: 2609) with full management capabilities",
@@ -133,7 +125,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Security Enhancements"
-              icon={<Shield className="h-4 w-4 text-orange-600" />}
               items={[
                 "API Monitoring page hidden from Viewer role (sidebar + route protection)",
                 "Add URL and Analyse All buttons hidden for Viewer users",
@@ -145,7 +136,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Critical Bug Fixes"
-              icon={<Bug className="h-4 w-4 text-red-600" />}
               items={[
                 "Fixed blank monitored pages results with smart fallback query system",
                 "Resolved ReferenceError: Zap is not defined in URLDetail component",
@@ -157,7 +147,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="User Experience Improvements"
-              icon={<CheckCircle className="h-4 w-4 text-green-600" />}
               items={[
                 "Seamless role-based navigation with hidden restricted features",
                 "Clear feedback system showing user role throughout the interface",
@@ -177,7 +166,6 @@ export default function Changelog() {
           >
             <ChangeSection
               title="UI Enhancements"
-              icon={<Sparkles className="h-4 w-4 text-blue-600" />}
               items={[
                 "Converted area charts to line charts for cleaner data visualization",
                 "Added visible dots and labels to all performance charts",
@@ -190,7 +178,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Interactive Features"
-              icon={<CheckCircle className="h-4 w-4 text-green-600" />}
               items={[
                 "Added hover tooltips for FCP and LCP metrics with detailed explanations",
                 "Implemented HoverCard component for educational metric information",
@@ -202,7 +189,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Performance & Charts"
-              icon={<Zap className="h-4 w-4 text-yellow-600" />}
               items={[
                 "Performance Score thresholds: Good (90+), Needs Improvement (50-90), Poor (<50)",
                 "LCP thresholds: Good (<2.5s), Needs Improvement (2.5-4s), Poor (>4s)",
@@ -222,7 +208,6 @@ export default function Changelog() {
           >
             <ChangeSection
               title="Core Features"
-              icon={<Sparkles className="h-4 w-4 text-blue-600" />}
               items={[
                 "PageSpeed Insights API integration for performance analysis",
                 "Automated analysis scheduling (3x daily at 6am, 2pm, 10pm UTC)",
@@ -234,7 +219,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Analysis Capabilities"
-              icon={<CheckCircle className="h-4 w-4 text-green-600" />}
               items={[
                 "Core Web Vitals monitoring (LCP, FCP, Performance Score)",
                 "Speed Index, Total Blocking Time, and Cumulative Layout Shift tracking",
@@ -246,7 +230,6 @@ export default function Changelog() {
 
             <ChangeSection
               title="Technical Foundation"
-              icon={<Zap className="h-4 w-4 text-yellow-600" />}
               items={[
                 "React frontend with Vite build system",
                 "Supabase backend for data storage and management",
