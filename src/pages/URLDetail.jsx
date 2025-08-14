@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { 
-  ArrowLeft, 
   ExternalLink, 
   CheckCircle, 
   XCircle, 
   Clock, 
-  Zap, 
-  Target, 
-  FileText, 
-  LinkIcon,
-  Users,
   TrendingUp,
   TrendingDown,
   Minus,
   BarChart3,
   Loader2,
-  FileCode,
-  Edit2,
-  Trash2,
   Info
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
@@ -63,7 +54,7 @@ import {
   ChartLegend, 
   ChartLegendContent 
 } from '../components/ui/chart'
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceArea, ReferenceLine } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'

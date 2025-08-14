@@ -29,18 +29,12 @@ import {
 import {
   Line,
   LineChart,
-  AreaChart,
-  Area,
   CartesianGrid,
-  ResponsiveContainer,
   XAxis,
   YAxis,
   RadialBarChart,
   RadialBar,
-  PolarGrid,
-  PolarAngleAxis,
   PolarRadiusAxis,
-  ReferenceArea,
   ReferenceLine
 } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
