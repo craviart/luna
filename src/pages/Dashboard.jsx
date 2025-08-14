@@ -319,38 +319,35 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
 
   // Speedometer Component using shadcn Radial Chart
   const SpeedometerChart = React.memo(({ score, analysisDate }) => {
-    const [animatedScore, setAnimatedScore] = useState(0)
-    const previousScoreRef = useRef(null)
-    const hasInitializedRef = useRef(false)
+    const [animatedScore, setAnimatedScore] = useState(score || 0) // Start with actual score
+    const hasAnimatedRef = useRef(new Set()) // Track which scores we've animated
     const actualScore = score || 0
     
-    // Only animate when score actually changes, not on re-renders
+    // Only animate when we haven't animated this score before
     useEffect(() => {
+      const hasAnimated = hasAnimatedRef.current.has(actualScore)
+      
       console.log(`🎯 SpeedometerChart (${actualScore}) useEffect:`, {
-        hasInitialized: hasInitializedRef.current,
-        previousScore: previousScoreRef.current,
         actualScore,
-        willAnimate: !hasInitializedRef.current || previousScoreRef.current !== actualScore
+        hasAnimated,
+        animatedScores: Array.from(hasAnimatedRef.current),
+        willAnimate: !hasAnimated
       })
       
-      // Check if this is the first mount or if score has actually changed
-      if (!hasInitializedRef.current || previousScoreRef.current !== actualScore) {
+      // Only animate if we haven't animated this exact score before
+      if (!hasAnimated) {
         console.log(`🚀 Starting animation: ${actualScore}`)
+        hasAnimatedRef.current.add(actualScore) // Mark this score as animated
         
-        // Only reset to 0 if this is not the initial mount with the same score
-        if (hasInitializedRef.current) {
-          setAnimatedScore(0) // Reset to 0 first for score changes
-        }
-        
+        // Start from 0 and animate to actual score
+        setAnimatedScore(0)
         const timer = setTimeout(() => {
           setAnimatedScore(actualScore)
-          hasInitializedRef.current = true
-          previousScoreRef.current = actualScore
-        }, hasInitializedRef.current ? 200 : 50) // Faster initial animation
+        }, 100)
         
         return () => clearTimeout(timer)
       } else {
-        console.log(`⏭️ Skipping animation for ${actualScore} (no change)`)
+        console.log(`⏭️ Skipping animation for ${actualScore} (already animated)`)
       }
     }, [actualScore])
     
