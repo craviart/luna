@@ -11,7 +11,8 @@ import {
   TestTube,
   Activity,
   Globe,
-  TrendingUp
+  TrendingUp,
+  Info
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -42,6 +43,11 @@ import {
 } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../components/ui/hover-card'
 
 export default function Dashboard() {
   const [monitoredUrls, setMonitoredUrls] = useState([])
@@ -557,13 +563,43 @@ export default function Dashboard() {
                         {/* Quick Metrics */}
                         <div className="grid grid-cols-2 gap-4 text-lg flex-1">
                           <div className="space-y-1">
-                            <div className="text-muted-foreground text-sm">FCP</div>
+                            <div className="text-muted-foreground text-sm flex items-center gap-1">
+                              FCP
+                              <HoverCard>
+                                <HoverCardTrigger asChild>
+                                  <Info className="h-3 w-3 cursor-help" />
+                                </HoverCardTrigger>
+                                <HoverCardContent className="w-80">
+                                  <div className="space-y-2">
+                                    <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                                    </p>
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                            </div>
                             <ColoredBadge variant="ghost" color={getFCPColor(url.latestAnalysis.fcp_time)}>
                               {formatTime(url.latestAnalysis.fcp_time)}
                             </ColoredBadge>
                           </div>
                           <div className="space-y-1">
-                            <div className="text-muted-foreground text-sm">LCP</div>
+                            <div className="text-muted-foreground text-sm flex items-center gap-1">
+                              LCP
+                              <HoverCard>
+                                <HoverCardTrigger asChild>
+                                  <Info className="h-3 w-3 cursor-help" />
+                                </HoverCardTrigger>
+                                <HoverCardContent className="w-80">
+                                  <div className="space-y-2">
+                                    <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                      LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                                    </p>
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                            </div>
                             <ColoredBadge variant="ghost" color={getLCPColor(url.latestAnalysis.lcp_time)}>
                               {formatTime(url.latestAnalysis.lcp_time)}
                             </ColoredBadge>
@@ -659,8 +695,21 @@ export default function Dashboard() {
               {/* LCP Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     Largest Contentful Paint (LCP)
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     LCP performance for all monitored pages over the last 30 days
@@ -713,8 +762,21 @@ export default function Dashboard() {
               {/* FCP Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     First Contentful Paint (FCP)
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     FCP performance for all monitored pages over the last 30 days

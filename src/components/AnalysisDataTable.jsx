@@ -9,7 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, ExternalLink, Eye } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, ExternalLink, Eye, Info } from "lucide-react"
 import NumberFlow from '@number-flow/react'
 
 import { Button } from "@/components/ui/button"
@@ -33,6 +33,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 
 // Helper function for FCP color coding
 const getFCPColor = (fcp) => {
@@ -65,8 +70,8 @@ const formatTime = (time) => {
 }
 
 // Colored Badge Component
-const ColoredBadge = ({ value, color, children }) => (
-  <Badge variant="outline" className="flex items-center gap-1">
+const ColoredBadge = ({ value, color, children, variant = "ghost" }) => (
+  <Badge variant={variant} className={`flex items-center gap-1 text-base ${variant === "ghost" ? "border-0" : ""}`}>
     <div 
       className="w-2 h-2 rounded-full" 
       style={{ backgroundColor: color }}
@@ -115,7 +120,10 @@ export const columns = [
     cell: ({ row }) => {
       const analysis = row.original
       return (
-        <Badge variant={analysis.success ? "secondary" : "destructive"}>
+        <Badge 
+          variant={analysis.success ? "secondary" : "destructive"}
+          className={analysis.success ? "bg-muted text-muted-foreground border-0" : ""}
+        >
           {analysis.success ? "Success" : "Failed"}
         </Badge>
       )
@@ -144,13 +152,44 @@ export const columns = [
     accessorKey: "fcp_time",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          FCP
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            FCP
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-1">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                <p className="text-sm text-muted-foreground">
+                  FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                </p>
+                <div className="text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span>Good: ≤ 1.8s</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <span>Needs Improvement: 1.8s - 3.0s</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                    <span>Poor: > 3.0s</span>
+                  </div>
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        </div>
       )
     },
     cell: ({ row }) => {
@@ -166,13 +205,44 @@ export const columns = [
     accessorKey: "lcp_time",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          LCP
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            LCP
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 ml-1">
+                <Info className="h-3 w-3 text-muted-foreground" />
+              </Button>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                <p className="text-sm text-muted-foreground">
+                  LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                </p>
+                <div className="text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span>Good: ≤ 2.5s</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <span>Needs Improvement: 2.5s - 4.0s</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                    <span>Poor: > 4.0s</span>
+                  </div>
+                </div>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        </div>
       )
     },
     cell: ({ row }) => {
