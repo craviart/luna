@@ -92,9 +92,31 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
       const avgFCP = Math.round(sites.reduce((sum, s) => sum + s.fcp, 0) / sites.length)
       const avgLCP = Math.round(sites.reduce((sum, s) => sum + s.lcp, 0) / sites.length)
 
+      // Add randomization to get different insights each time
+      const focusAreas = [
+        "conversion rate optimization and revenue impact",
+        "user experience and customer satisfaction", 
+        "technical performance thresholds and Core Web Vitals",
+        "competitive advantage through faster loading times",
+        "mobile performance and mobile commerce impact",
+        "bounce rate reduction and engagement metrics"
+      ]
+      
+      const perspectives = [
+        "from a business strategy standpoint",
+        "from a technical optimization perspective", 
+        "from a user experience angle",
+        "from a revenue generation viewpoint",
+        "from a competitive positioning perspective"
+      ]
+      
+      const randomFocus = focusAreas[Math.floor(Math.random() * focusAreas.length)]
+      const randomPerspective = perspectives[Math.floor(Math.random() * perspectives.length)]
+      const randomSeed = Math.floor(Math.random() * 1000)
+
       const prompt = `You are a front-end developer and web performance expert working for an ecommerce website. You're responsible for helping people understand how performance directly impacts conversion rates and business success. As an engineer, provide precise technical insights while emphasizing business impact.
 
-Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes:
+Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes, focusing specifically on: ${randomFocus} ${randomPerspective}.
 
 SITES PERFORMANCE:
 ${sites.map(site => 
@@ -109,7 +131,7 @@ SUMMARY:
 • Average FCP: ${avgFCP}ms
 • Average LCP: ${avgLCP}ms
 
-Focus on: How these metrics affect conversion rates, user experience, and revenue. Be technically precise but emphasize business impact. Mention specific performance thresholds that matter for ecommerce (FCP <1.8s, LCP <2.5s for good conversion rates).`
+Provide a unique insight each time with fresh wording. Be technically precise but emphasize business impact. Reference specific thresholds (FCP <1.8s, LCP <2.5s) when relevant. Analysis ID: ${randomSeed}`
 
       // Call AI API
       const response = await fetch('/api/ai-insights', {
