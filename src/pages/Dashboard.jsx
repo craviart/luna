@@ -318,20 +318,27 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
   }
 
   // Speedometer Component using shadcn Radial Chart
-  const SpeedometerChart = ({ score, analysisDate }) => {
+  const SpeedometerChart = React.memo(({ score, analysisDate }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
     const previousScoreRef = useRef(null)
+    const hasInitializedRef = useRef(false)
     const actualScore = score || 0
     
     // Only animate when score actually changes, not on re-renders
     useEffect(() => {
       // Check if this is the first mount or if score has actually changed
-      if (previousScoreRef.current === null || previousScoreRef.current !== actualScore) {
-        setAnimatedScore(0) // Reset to 0 first
+      if (!hasInitializedRef.current || previousScoreRef.current !== actualScore) {
+        // Only reset to 0 if this is not the initial mount with the same score
+        if (hasInitializedRef.current) {
+          setAnimatedScore(0) // Reset to 0 first for score changes
+        }
+        
         const timer = setTimeout(() => {
           setAnimatedScore(actualScore)
-        }, 200)
-        previousScoreRef.current = actualScore
+          hasInitializedRef.current = true
+          previousScoreRef.current = actualScore
+        }, hasInitializedRef.current ? 200 : 50) // Faster initial animation
+        
         return () => clearTimeout(timer)
       }
     }, [actualScore])
@@ -404,7 +411,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         </div>
       </div>
     )
-  }
+  })
 
 
 
@@ -647,9 +654,11 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
       // Process chart data
       const processedChartData = processChartData(chartAnalyses || [])
 
+      // Batch state updates to reduce re-renders
       setMonitoredUrls(processedUrls)
       setAllAnalyses(combinedAnalyses)
       setChartData(processedChartData)
+      setLoading(false) // Set loading false here to prevent re-render during AI generation
 
       // Generate AI insights when data is loaded (only if we have sites with data)
       if (processedUrls.length > 0) {
@@ -660,8 +669,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error)
-    } finally {
-      setLoading(false)
+      setLoading(false) // Also set loading false in error case
     }
   }
 
