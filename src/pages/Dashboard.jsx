@@ -608,20 +608,7 @@ export default function Dashboard() {
                   config={getChartConfig(chartData.urlNames, 'performance')} 
                   className="h-[400px] w-full"
                 >
-                  <AreaChart data={chartData.data}>
-                    <defs>
-                      {chartData.urlNames?.map((urlName, index) => {
-                        const config = getChartConfig(chartData.urlNames, 'performance')
-                        const areaConfig = config[`${urlName}_performance`]
-                        const gradientId = `gradient-${urlName}-performance`
-                        return (
-                          <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.4} />
-                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.0} />
-                          </linearGradient>
-                        )
-                      })}
-                    </defs>
+                  <LineChart data={chartData.data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
                       dataKey="date" 
@@ -642,23 +629,21 @@ export default function Dashboard() {
                     <ChartLegend content={<ChartLegendContent />} />
                     {chartData.urlNames?.map((urlName, index) => {
                       const config = getChartConfig(chartData.urlNames, 'performance')
-                      const areaConfig = config[`${urlName}_performance`]
-                      const gradientId = `gradient-${urlName}-performance`
+                      const lineConfig = config[`${urlName}_performance`]
                       return (
-                        <Area
+                        <Line
                           key={urlName}
                           type="monotone"
                           dataKey={`${urlName}_performance`}
-                          stroke={areaConfig?.color}
-                          strokeWidth={2}
-                          fill={`url(#${gradientId})`}
+                          stroke={lineConfig?.color}
+                          strokeWidth={3}
                           connectNulls={false}
                           dot={false}
-                          activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
+                          activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
                         />
                       )
                     })}
-                  </AreaChart>
+                  </LineChart>
                 </ChartContainer>
               </CardContent>
             </Card>
