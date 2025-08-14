@@ -132,7 +132,7 @@ const toolsItems = [
 
 export function AppSidebar() {
   const location = useLocation()
-  const { signOut, hasPermission } = useAuth()
+  const { signOut, hasPermission, user } = useAuth()
   const { isMobile, setOpenMobile } = useSidebar()
   const [subtitleText, setSubtitleText] = useState("Performance monitoring")
   const [isHovering, setIsHovering] = useState(false)
@@ -331,7 +331,7 @@ export function AppSidebar() {
                   <Shield className="h-3 w-3" />
                 </div>
                 <div className="grid flex-1 text-left text-xs leading-tight">
-                  <span className="truncate font-medium">Pin Access</span>
+                  <span className="truncate font-medium">{user?.role || 'User'}</span>
                   <span className="truncate text-[10px] text-muted-foreground">Authenticated</span>
                 </div>
               </div>
