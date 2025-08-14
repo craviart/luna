@@ -159,7 +159,7 @@ export default function Dashboard() {
   }
 
   // Speedometer Component using shadcn Radial Chart
-  const SpeedometerChart = ({ score }) => {
+  const SpeedometerChart = ({ score, analysisDate }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
     const actualScore = score || 0
     
@@ -194,6 +194,18 @@ export default function Dashboard() {
     
     const totalScore = animatedScore
     
+    // Format the analysis date
+    const formatAnalysisDate = (date) => {
+      if (!date) return 'No data'
+      const analysisDate = new Date(date)
+      return analysisDate.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+    
     return (
       <div className="mx-auto aspect-square max-h-[250px]">
         <ChartContainer
@@ -214,7 +226,7 @@ export default function Dashboard() {
         </ChartContainer>
         
         {/* Score text overlay - positioned in center */}
-        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-2">
+        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
           <div className="text-center">
             <div className="text-4xl font-bold">
               <NumberFlow 
@@ -223,7 +235,7 @@ export default function Dashboard() {
                 willChange
               />
             </div>
-            <div className="text-sm text-muted-foreground">Score</div>
+            <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
           </div>
         </div>
       </div>
@@ -535,8 +547,11 @@ export default function Dashboard() {
                       <>
                         {/* Performance Score - Speedometer */}
                         <div className="text-center py-2 bg-muted/50 rounded-lg">
-                          <div className="text-sm text-muted-foreground mb-2">Performance Score</div>
-                          <SpeedometerChart score={url.latestAnalysis.performance_score} />
+                          <div className="text-sm text-muted-foreground mb-1">Performance Score</div>
+                          <SpeedometerChart 
+                            score={url.latestAnalysis.performance_score} 
+                            analysisDate={url.latestAnalysis.created_at}
+                          />
                         </div>
                         
                         {/* Quick Metrics */}
