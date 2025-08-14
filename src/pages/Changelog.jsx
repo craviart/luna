@@ -105,7 +105,7 @@ export default function Changelog() {
         <div className="space-y-8">
           <ChangelogEntry
             version="v0.3.0-beta"
-            date="January 12, 2025"
+            date="January 12, 2024"
             title="Role-based Access Control & Critical Bug Fixes"
             description="Major security enhancement with comprehensive user role management system, plus critical stability improvements for monitored page data loading."
             type="security"
@@ -159,7 +159,7 @@ export default function Changelog() {
 
           <ChangelogEntry
             version="v0.2.0-beta"
-            date="January 8, 2025"
+            date="January 8, 2024"
             title="Clean UI & Improved Experience"
             description="Comprehensive user interface improvements with enhanced charts, tooltips, and sidebar reorganization for better user experience."
             type="improvement"
@@ -245,13 +245,7 @@ export default function Changelog() {
         <div className="mt-16 pt-8 border-t border-border">
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Have feedback or feature requests?{' '}
-              <a 
-                href="mailto:feedback@luna-analytics.com" 
-                className="text-foreground hover:underline"
-              >
-                Get in touch
-              </a>
+              End of changelog
             </p>
           </div>
         </div>
