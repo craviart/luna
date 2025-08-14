@@ -323,10 +323,14 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     const hasAnimatedRef = useRef(new Set()) // Track which scores we've animated
     const actualScore = score || 0
     
-    // NUCLEAR TEST: No animation at all - just set the score directly
+    // Animate only once when component mounts or score actually changes
     useEffect(() => {
-      console.log(`🎯 SpeedometerChart (${actualScore}) - SETTING SCORE DIRECTLY (NO ANIMATION)`)
-      setAnimatedScore(actualScore) // Just set it directly, no animation
+      console.log(`🎯 SpeedometerChart (${actualScore}) - Starting animation`)
+      setAnimatedScore(0) // Reset to 0
+      const timer = setTimeout(() => {
+        setAnimatedScore(actualScore) // Animate to actual score
+      }, 100)
+      return () => clearTimeout(timer)
     }, [actualScore])
     
     // Chart data - desktop shows the score, mobile shows the remaining portion
@@ -387,7 +391,11 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
           <div className="text-center">
             <div className="text-4xl font-bold">
-              {Math.round(animatedScore)}
+              <NumberFlow 
+                value={animatedScore} 
+                format={{ maximumFractionDigits: 0 }}
+                willChange
+              />
             </div>
             <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
           </div>
@@ -722,7 +730,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
                         <div className="text-center py-2 bg-muted/50 rounded-lg">
                           <div className="text-sm text-muted-foreground mb-1">Performance Score</div>
                           <SpeedometerChart 
-                            key={`speedometer-${url.id}-${url.latestAnalysis.performance_score}`}
+                            key={`speedometer-stable-${url.id}`}
                             score={url.latestAnalysis.performance_score} 
                             analysisDate={url.latestAnalysis.created_at}
                           />
