@@ -139,8 +139,8 @@ export default function Dashboard() {
   }
 
   // Colored Badge Component
-  const ColoredBadge = ({ value, color, children }) => (
-    <Badge variant="outline" className="flex items-center gap-1">
+  const ColoredBadge = ({ value, color, children, variant = "outline" }) => (
+    <Badge variant={variant} className={`flex items-center gap-1 ${variant === "ghost" ? "border-0" : ""}`}>
       <div 
         className="w-2 h-2 rounded-full" 
         style={{ backgroundColor: color }}
@@ -555,16 +555,16 @@ export default function Dashboard() {
                         </div>
                         
                         {/* Quick Metrics */}
-                        <div className="grid grid-cols-2 gap-4 text-sm flex-1">
+                        <div className="grid grid-cols-2 gap-4 text-lg flex-1">
                           <div className="space-y-1">
-                            <div className="text-muted-foreground">FCP</div>
-                            <ColoredBadge color={getFCPColor(url.latestAnalysis.fcp_time)}>
+                            <div className="text-muted-foreground text-sm">FCP</div>
+                            <ColoredBadge variant="ghost" color={getFCPColor(url.latestAnalysis.fcp_time)}>
                               {formatTime(url.latestAnalysis.fcp_time)}
                             </ColoredBadge>
                           </div>
                           <div className="space-y-1">
-                            <div className="text-muted-foreground">LCP</div>
-                            <ColoredBadge color={getLCPColor(url.latestAnalysis.lcp_time)}>
+                            <div className="text-muted-foreground text-sm">LCP</div>
+                            <ColoredBadge variant="ghost" color={getLCPColor(url.latestAnalysis.lcp_time)}>
                               {formatTime(url.latestAnalysis.lcp_time)}
                             </ColoredBadge>
                           </div>
@@ -791,38 +791,44 @@ export default function Dashboard() {
                     {allAnalyses.slice(0, 10).map((analysis) => (
                       <TableRow key={`${analysis.type}-${analysis.id}`}>
                         <TableCell>
-                          <Badge variant={analysis.type === 'monitored' ? 'default' : 'secondary'}>
+                          <Badge variant={analysis.type === 'monitored' ? 'outline' : 'secondary'}>
                             {analysis.type === 'monitored' ? 'Monitored' : 'Quick Test'}
                           </Badge>
                         </TableCell>
-                        <TableCell className="max-w-48 truncate">
+                        <TableCell className="max-w-48 truncate text-base">
                           {analysis.type === 'quick_test' 
                             ? cleanUrl(analysis.display_url) 
                             : cleanUrl(analysis.display_url) || 'Loading...'
                           }
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getPerformanceColor(analysis.performance_score)}>
-                            {analysis.performance_score ? (
-                              <NumberFlow 
-                                value={analysis.performance_score} 
-                                format={{ maximumFractionDigits: 0 }}
-                                suffix="/100"
-                                willChange
-                              />
-                            ) : (
-                              'N/A'
-                            )}
+                          <ColoredBadge variant="ghost" color={getPerformanceColor(analysis.performance_score)}>
+                            <span className="text-base">
+                              {analysis.performance_score ? (
+                                <NumberFlow 
+                                  value={analysis.performance_score} 
+                                  format={{ maximumFractionDigits: 0 }}
+                                  suffix="/100"
+                                  willChange
+                                />
+                              ) : (
+                                'N/A'
+                              )}
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getFCPColor(analysis.fcp_time)}>
-                            <AnimatedTime time={analysis.fcp_time} />
+                          <ColoredBadge variant="ghost" color={getFCPColor(analysis.fcp_time)}>
+                            <span className="text-base">
+                              <AnimatedTime time={analysis.fcp_time} />
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
-                          <ColoredBadge color={getLCPColor(analysis.lcp_time)}>
-                            <AnimatedTime time={analysis.lcp_time} />
+                          <ColoredBadge variant="ghost" color={getLCPColor(analysis.lcp_time)}>
+                            <span className="text-base">
+                              <AnimatedTime time={analysis.lcp_time} />
+                            </span>
                           </ColoredBadge>
                         </TableCell>
                         <TableCell>
