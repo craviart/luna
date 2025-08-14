@@ -58,7 +58,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('7d')
   const [cachedInsight, setCachedInsight] = useState('')
-  const [insightLoading, setInsightLoading] = useState(false)
 
   // Helper function to get date range based on selected time range
   const getDateRange = () => {
@@ -166,7 +165,6 @@ export default function Dashboard() {
   // Generate AI insights when data changes
   const generateAIInsight = async (urlsData) => {
     try {
-      setInsightLoading(true)
       
       // Prepare data for AI analysis
       const sites = urlsData.filter(url => url.latestAnalysis?.performance_score > 0).map(url => ({
@@ -315,7 +313,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         setCachedInsight("Performance insights are temporarily unavailable. Your current metrics show areas for ecommerce optimization.")
       }
     } finally {
-      setInsightLoading(false)
+      // No cleanup needed since we're not showing loading state
     }
   }
 
@@ -698,7 +696,6 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         {/* AI Performance Insights */}
         <AIInsights 
           cachedInsight={cachedInsight}
-          isGenerating={insightLoading}
           loading={loading}
         />
 

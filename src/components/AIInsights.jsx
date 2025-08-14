@@ -55,7 +55,7 @@ const BlackLoader = () => (
   </div>
 )
 
-export default function AIInsights({ cachedInsight, isGenerating, loading }) {
+export default function AIInsights({ cachedInsight, loading }) {
   const [animationKey, setAnimationKey] = useState(0)
 
   // Force re-render of AIWriter when cached insight changes
@@ -65,8 +65,8 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
     }
   }, [cachedInsight])
 
-  // Don't render anything while loading, if no insight, or if rate limited
-  if (loading || (!cachedInsight && !isGenerating)) {
+  // Don't render anything while loading or if no insight
+  if (loading || !cachedInsight) {
     return null
   }
 
@@ -83,24 +83,20 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
     <Card className="relative overflow-hidden">
       <CardContent className="p-6">
         <div className="w-full">
-          {isGenerating ? (
-            <BlackLoader />
-          ) : cachedInsight ? (
-            <div 
-              className="text-[20px] leading-[1.5] sm:text-[32px] sm:leading-[1.4]"
-              style={{
-                color: 'hsl(var(--foreground))',
-                fontWeight: '400'
-              }}
+          <div 
+            className="text-[20px] leading-[1.5] sm:text-[32px] sm:leading-[1.4]"
+            style={{
+              color: 'hsl(var(--foreground))',
+              fontWeight: '400'
+            }}
+          >
+            <AIWriter
+              key={`insight-${animationKey}-${cachedInsight.length}`}
+              delay={80}
             >
-              <AIWriter
-                key={`insight-${animationKey}-${cachedInsight.length}`}
-                delay={80}
-              >
-                <span>{cachedInsight}</span>
-              </AIWriter>
-            </div>
-          ) : null}
+              <span>{cachedInsight}</span>
+            </AIWriter>
+          </div>
         </div>
       </CardContent>
     </Card>
