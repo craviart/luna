@@ -652,8 +652,7 @@ export default function Dashboard() {
                           stroke={areaConfig?.color}
                           strokeWidth={2}
                           fill={`url(#${gradientId})`}
-                          fillOpacity={0.3}
-                          stackId={`stack-${index}`}
+                          fillOpacity={0.2}
                           connectNulls={false}
                           dot={false}
                           activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
@@ -725,8 +724,7 @@ export default function Dashboard() {
                             stroke={areaConfig?.color}
                             strokeWidth={2}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.3}
-                            stackId={`stack-${index}`}
+                            fillOpacity={0.2}
                             connectNulls={false}
                             dot={false}
                             activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
@@ -796,8 +794,7 @@ export default function Dashboard() {
                             stroke={areaConfig?.color}
                             strokeWidth={2}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.3}
-                            stackId={`stack-${index}`}
+                            fillOpacity={0.2}
                             connectNulls={false}
                             dot={false}
                             activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
