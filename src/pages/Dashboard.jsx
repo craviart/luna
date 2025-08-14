@@ -669,22 +669,22 @@ export default function Dashboard() {
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <ChartLegend content={<ChartLegendContent />} />
-                    {chartData.urlNames?.map((urlName, index) => {
-                      const config = getChartConfig(chartData.urlNames, 'performance')
-                      const lineConfig = config[`${urlName}_performance`]
-                      return (
-                        <Line
-                          key={urlName}
-                          type="monotone"
-                          dataKey={`${urlName}_performance`}
-                          stroke={lineConfig?.color}
-                          strokeWidth={3}
-                          connectNulls={false}
-                          dot={false}
-                          activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
-                        />
-                      )
-                    })}
+                                          {chartData.urlNames?.map((urlName, index) => {
+                        const config = getChartConfig(chartData.urlNames, 'performance')
+                        const lineConfig = config[`${urlName}_performance`]
+                        return (
+                          <Line
+                            key={urlName}
+                            type="monotone"
+                            dataKey={`${urlName}_performance`}
+                            stroke={lineConfig?.color}
+                            strokeWidth={3}
+                            connectNulls={false}
+                            dot={{ fill: lineConfig?.color, strokeWidth: 2, r: 4 }}
+                            activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
+                          />
+                        )
+                      })}
                   </LineChart>
                 </ChartContainer>
               </CardContent>
@@ -738,22 +738,22 @@ export default function Dashboard() {
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
-                      {chartData.urlNames?.map((urlName, index) => {
-                        const config = getChartConfig(chartData.urlNames, 'lcp')
-                        const lineConfig = config[`${urlName}_lcp`]
-                        return (
-                          <Line
-                            key={urlName}
-                            type="monotone"
-                            dataKey={`${urlName}_lcp`}
-                            stroke={lineConfig?.color}
-                            strokeWidth={3}
-                            connectNulls={false}
-                            dot={false}
-                            activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
-                          />
-                        )
-                      })}
+                                              {chartData.urlNames?.map((urlName, index) => {
+                          const config = getChartConfig(chartData.urlNames, 'lcp')
+                          const lineConfig = config[`${urlName}_lcp`]
+                          return (
+                            <Line
+                              key={urlName}
+                              type="monotone"
+                              dataKey={`${urlName}_lcp`}
+                              stroke={lineConfig?.color}
+                              strokeWidth={3}
+                              connectNulls={false}
+                              dot={{ fill: lineConfig?.color, strokeWidth: 2, r: 4 }}
+                              activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
+                            />
+                          )
+                        })}
                     </LineChart>
                   </ChartContainer>
                 </CardContent>
@@ -805,22 +805,22 @@ export default function Dashboard() {
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <ChartLegend content={<ChartLegendContent />} />
-                      {chartData.urlNames?.map((urlName, index) => {
-                        const config = getChartConfig(chartData.urlNames, 'fcp')
-                        const lineConfig = config[`${urlName}_fcp`]
-                        return (
-                          <Line
-                            key={urlName}
-                            type="monotone"
-                            dataKey={`${urlName}_fcp`}
-                            stroke={lineConfig?.color}
-                            strokeWidth={3}
-                            connectNulls={false}
-                            dot={false}
-                            activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
-                          />
-                        )
-                      })}
+                                              {chartData.urlNames?.map((urlName, index) => {
+                          const config = getChartConfig(chartData.urlNames, 'fcp')
+                          const lineConfig = config[`${urlName}_fcp`]
+                          return (
+                            <Line
+                              key={urlName}
+                              type="monotone"
+                              dataKey={`${urlName}_fcp`}
+                              stroke={lineConfig?.color}
+                              strokeWidth={3}
+                              connectNulls={false}
+                              dot={{ fill: lineConfig?.color, strokeWidth: 2, r: 4 }}
+                              activeDot={{ r: 6, fill: lineConfig?.color, stroke: '#fff', strokeWidth: 2 }}
+                            />
+                          )
+                        })}
                     </LineChart>
                   </ChartContainer>
                 </CardContent>

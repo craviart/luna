@@ -861,7 +861,7 @@ export default function URLDetail() {
                         dataKey="fcp_time"
                         stroke="hsl(221, 83%, 53%)"
                         strokeWidth={3}
-                        dot={false}
+                        dot={{ fill: "hsl(221, 83%, 53%)", strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6, fill: "hsl(221, 83%, 53%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
@@ -950,7 +950,7 @@ export default function URLDetail() {
                         dataKey="lcp_time"
                         stroke="hsl(212, 95%, 68%)"
                         strokeWidth={3}
-                        dot={false}
+                        dot={{ fill: "hsl(212, 95%, 68%)", strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6, fill: "hsl(212, 95%, 68%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
@@ -1013,7 +1013,7 @@ export default function URLDetail() {
                         dataKey="performance_score"
                         stroke="hsl(216, 87%, 45%)"
                         strokeWidth={3}
-                        dot={false}
+                        dot={{ fill: "hsl(216, 87%, 45%)", strokeWidth: 2, r: 4 }}
                         activeDot={{ r: 6, fill: "hsl(216, 87%, 45%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
