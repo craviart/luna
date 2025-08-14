@@ -616,8 +616,8 @@ export default function Dashboard() {
                         const gradientId = `gradient-${urlName}-performance`
                         return (
                           <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.4} />
+                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.0} />
                           </linearGradient>
                         )
                       })}
@@ -652,7 +652,6 @@ export default function Dashboard() {
                           stroke={areaConfig?.color}
                           strokeWidth={2}
                           fill={`url(#${gradientId})`}
-                          fillOpacity={0.2}
                           connectNulls={false}
                           dot={false}
                           activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
@@ -689,8 +688,8 @@ export default function Dashboard() {
                           const gradientId = `gradient-${urlName}-lcp`
                           return (
                             <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                                                          <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.4} />
+                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.0} />
                             </linearGradient>
                           )
                         })}
@@ -724,7 +723,7 @@ export default function Dashboard() {
                             stroke={areaConfig?.color}
                             strokeWidth={2}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.2}
+  
                             connectNulls={false}
                             dot={false}
                             activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
@@ -759,8 +758,8 @@ export default function Dashboard() {
                           const gradientId = `gradient-${urlName}-fcp`
                           return (
                             <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.8} />
-                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                                                          <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.4} />
+                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.0} />
                             </linearGradient>
                           )
                         })}
@@ -794,7 +793,7 @@ export default function Dashboard() {
                             stroke={areaConfig?.color}
                             strokeWidth={2}
                             fill={`url(#${gradientId})`}
-                            fillOpacity={0.2}
+  
                             connectNulls={false}
                             dot={false}
                             activeDot={{ r: 4, fill: areaConfig?.color, stroke: areaConfig?.color }}
