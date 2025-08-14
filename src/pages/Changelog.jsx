@@ -3,36 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/badge'
 import { Separator } from '../components/ui/separator'
 
-const ChangelogEntry = ({ version, date, title, description, type = 'feature', children }) => {
-  const getTypeColor = () => {
-    switch (type) {
-      case 'feature':
-        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800'
-      case 'improvement':
-        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800'
-      case 'fix':
-        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800'
-      case 'security':
-        return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-400 dark:border-orange-800'
-      default:
-        return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950 dark:text-gray-400 dark:border-gray-800'
-    }
-  }
-
-  const getTypeLabel = () => {
-    switch (type) {
-      case 'feature':
-        return 'Feature'
-      case 'improvement':
-        return 'Improvement'
-      case 'fix':
-        return 'Fix'
-      case 'security':
-        return 'Security'
-      default:
-        return 'Update'
-    }
-  }
+const ChangelogEntry = ({ version, date, title, description, children }) => {
 
   return (
     <div className="mb-8">
@@ -45,9 +16,6 @@ const ChangelogEntry = ({ version, date, title, description, type = 'feature', c
             {version}
           </Badge>
         )}
-        <Badge className={getTypeColor()}>
-          {getTypeLabel()}
-        </Badge>
       </div>
 
       <Card>
@@ -108,7 +76,6 @@ export default function Changelog() {
             date="August 14, 2025"
             title="Role-based Access Control & Critical Bug Fixes"
             description="Major security enhancement with comprehensive user role management system, plus critical stability improvements for monitored page data loading."
-            type="security"
           >
             <ChangeSection
               title="New Features"
@@ -162,7 +129,6 @@ export default function Changelog() {
             date="August 14, 2025"
             title="Clean UI & Improved Experience"
             description="Comprehensive user interface improvements with enhanced charts, tooltips, and sidebar reorganization for better user experience."
-            type="improvement"
           >
             <ChangeSection
               title="UI Enhancements"
@@ -204,7 +170,6 @@ export default function Changelog() {
             date="August 6, 2025"
             title="Initial Beta Release"
             description="First public beta release of Luna Analytics with core performance monitoring capabilities and automated analysis features."
-            type="feature"
           >
             <ChangeSection
               title="Core Features"
