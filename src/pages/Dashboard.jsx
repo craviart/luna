@@ -283,20 +283,11 @@ export default function Dashboard() {
   // Chart configurations for different metrics using blue theme colors
   const getChartConfig = (urlNames, metricType) => {
     const config = {}
-    // Blue-themed gradient color palette inspired by shadcn/ui charts
+    // Clear blue color differentiation: blue-200, blue-400, blue-600
     const blueThemeColors = [
-      'hsl(221, 83%, 53%)',   // Primary blue
-      'hsl(212, 95%, 68%)',   // Light blue
-      'hsl(216, 87%, 45%)',   // Medium blue
-      'hsl(224, 76%, 60%)',   // Bright blue
-      'hsl(210, 40%, 55%)',   // Blue-gray
-      'hsl(199, 89%, 48%)',   // Sky blue
-      'hsl(207, 90%, 54%)',   // Azure
-      'hsl(200, 98%, 39%)',   // Deep blue
-      'hsl(215, 74%, 65%)',   // Periwinkle
-      'hsl(204, 94%, 44%)',   // Ocean blue
-      'hsl(213, 82%, 57%)',   // Royal blue
-      'hsl(208, 88%, 50%)'    // Cobalt blue
+      '#bfdbfe',   // blue-200 - lightest
+      '#60a5fa',   // blue-400 - medium  
+      '#2563eb',   // blue-600 - darkest
     ]
     
     urlNames.forEach((urlName, index) => {
