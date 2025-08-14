@@ -312,10 +312,10 @@ export function AppSidebar() {
             {/* Version Info */}
             <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border/50 mt-2">
               <div className="mb-1">
-                <span>Version v0.2.0-beta</span>
+                <span>Version v0.3.0-beta</span>
               </div>
               <div className="text-[10px] text-muted-foreground/70">
-                Clean UI & improved experience
+                Role-based access control & bug fixes
               </div>
             </div>
           </SidebarGroupContent>
