@@ -18,7 +18,8 @@ import {
   Loader2,
   FileCode,
   Edit2,
-  Trash2
+  Trash2,
+  Info
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -66,6 +67,11 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Responsi
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../components/ui/hover-card'
 
 // Google PageSpeed Insights color coding for Core Web Vitals
 // Clean URL display function - remove protocol and www for cooler look
@@ -778,8 +784,35 @@ export default function URLDetail() {
               {/* First Contentful Paint Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     First Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                          <div className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span>Good: ≤ 1.8s</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <span>Needs Improvement: 1.8s - 3.0s</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                              <span>Poor: > 3.0s</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     Loading speed over time (lower is better)
@@ -840,8 +873,35 @@ export default function URLDetail() {
               {/* Largest Contentful Paint Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     Largest Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                          <div className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span>Good: ≤ 2.5s</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <span>Needs Improvement: 2.5s - 4.0s</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                              <span>Poor: > 4.0s</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     Main content loading time (lower is better)
@@ -984,12 +1044,46 @@ export default function URLDetail() {
                 rawValue={latestAnalysis.performance_score || 0}
               />
               <MetricCard
-                title="First Contentful Paint"
+                title={
+                  <div className="flex items-center gap-2">
+                    First Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                }
                 value={formatTime(latestAnalysis.fcp_time)}
                 trend={trends.fcpTime}
               />
               <MetricCard
-                title="Largest Contentful Paint"
+                title={
+                  <div className="flex items-center gap-2">
+                    Largest Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                }
                 value={formatTime(latestAnalysis.lcp_time)}
                 trend={trends.lcpTime}
               />

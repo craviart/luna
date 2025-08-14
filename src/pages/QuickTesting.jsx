@@ -57,8 +57,8 @@ export default function QuickTesting() {
   }
 
   // Colored Badge Component
-  const ColoredBadge = ({ value, color, children }) => (
-    <Badge variant="outline" className="flex items-center gap-1">
+  const ColoredBadge = ({ value, color, children, variant = "ghost" }) => (
+    <Badge variant={variant} className={`flex items-center gap-1 text-base ${variant === "ghost" ? "border-0" : ""}`}>
       <div 
         className="w-2 h-2 rounded-full" 
         style={{ backgroundColor: color }}
