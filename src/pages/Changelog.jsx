@@ -105,7 +105,7 @@ export default function Changelog() {
         <div className="space-y-8">
           <ChangelogEntry
             version="v0.3.0-beta"
-            date="January 12, 2024"
+            date="August 14, 2025"
             title="Role-based Access Control & Critical Bug Fixes"
             description="Major security enhancement with comprehensive user role management system, plus critical stability improvements for monitored page data loading."
             type="security"
@@ -159,7 +159,7 @@ export default function Changelog() {
 
           <ChangelogEntry
             version="v0.2.0-beta"
-            date="January 8, 2024"
+            date="August 14, 2025"
             title="Clean UI & Improved Experience"
             description="Comprehensive user interface improvements with enhanced charts, tooltips, and sidebar reorganization for better user experience."
             type="improvement"
@@ -201,7 +201,7 @@ export default function Changelog() {
 
           <ChangelogEntry
             version="v0.1.0-beta"
-            date="December 2024"
+            date="August 6, 2025"
             title="Initial Beta Release"
             description="First public beta release of Luna Analytics with core performance monitoring capabilities and automated analysis features."
             type="feature"
