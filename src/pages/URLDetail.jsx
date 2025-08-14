@@ -57,6 +57,7 @@ import {
 } from '../components/ui/chart'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
+import { useAuth } from '../contexts/AuthContext'
 import { toast } from 'sonner'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
 import {
@@ -132,6 +133,7 @@ const formatBytes = (bytes) => {
 export default function URLDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { hasPermission } = useAuth()
   const [url, setUrl] = useState(null)
   const [analyses, setAnalyses] = useState([])
   const [chartData, setChartData] = useState([])
@@ -777,21 +779,23 @@ export default function URLDetail() {
                   <Button variant="outline" size="sm" onClick={handleEditTitle} className="lg:w-auto">
                     Edit Title
                   </Button>
-                  <Button 
-                    onClick={handleAnalyze}
-                    disabled={isAnalyzing}
-                    size="sm"
-                    className="lg:w-auto"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      'Run New Analysis'
-                    )}
-                  </Button>
+                  {hasPermission('runAnalysis') && (
+                    <Button 
+                      onClick={handleAnalyze}
+                      disabled={isAnalyzing}
+                      size="sm"
+                      className="lg:w-auto"
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        'Run New Analysis'
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

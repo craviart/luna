@@ -175,7 +175,7 @@ export default function URLsPage() {
 
 
   
-  const { user } = useAuth()
+  const { user, hasPermission } = useAuth()
 
   useEffect(() => {
     loadUrls()
@@ -442,21 +442,24 @@ export default function URLsPage() {
             </p>
           </div>
           <div className="mt-6 sm:mt-0 flex gap-3">
-            <Button 
-              variant="secondary" 
-              onClick={handleBulkAnalysis}
-              disabled={isBulkAnalyzing || urlsWithScores.length === 0}
-            >
-              <Play className="mr-2 h-4 w-4" />
-              Analyze All
-            </Button>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add URL
-                </Button>
-              </DialogTrigger>
+            {hasPermission('analyseAll') && (
+              <Button 
+                variant="secondary" 
+                onClick={handleBulkAnalysis}
+                disabled={isBulkAnalyzing || urlsWithScores.length === 0}
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Analyze All
+              </Button>
+            )}
+            {hasPermission('addUrl') && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add URL
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle>Add New URL</DialogTitle>
@@ -519,6 +522,7 @@ export default function URLsPage() {
                 </form>
               </DialogContent>
             </Dialog>
+            )}
           </div>
         </div>
 
@@ -533,10 +537,12 @@ export default function URLsPage() {
               <CardDescription className="text-center max-w-md mb-6">
                 Start by adding your first website to analyze and track its performance.
               </CardDescription>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Your First URL
-              </Button>
+              {hasPermission('addUrl') && (
+                <Button onClick={() => setIsDialogOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First URL
+                </Button>
+              )}
             </CardContent>
           </Card>
         ) : (

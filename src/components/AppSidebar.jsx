@@ -132,7 +132,7 @@ const toolsItems = [
 
 export function AppSidebar() {
   const location = useLocation()
-  const { signOut } = useAuth()
+  const { signOut, hasPermission } = useAuth()
   const { isMobile, setOpenMobile } = useSidebar()
   const [subtitleText, setSubtitleText] = useState("Performance monitoring")
   const [isHovering, setIsHovering] = useState(false)
@@ -271,7 +271,13 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <TooltipProvider>
-                {performanceItems.map((item) => (
+                {performanceItems.filter(item => {
+                  // Show API Monitoring only if user has permission
+                  if (item.title === "API Monitoring") {
+                    return hasPermission('viewApiMonitoring')
+                  }
+                  return true
+                }).map((item) => (
                   <SidebarMenuItem key={item.title}>
                     {item.disabled ? (
                       <Tooltip delayDuration={0}>

@@ -22,7 +22,12 @@ export default function AuthForm() {
       if (!success) {
         throw new Error(error.message)
       }
-              toast.success('Welcome to Luna Analytics!')
+      
+      // Show role-specific welcome message
+      const role = pin === '2609' ? 'Admin' : 'Viewer'
+      toast.success(`Welcome to Luna Analytics!`, {
+        description: `Signed in as ${role}`
+      })
     } catch (error) {
       toast.error(error.message)
       setPin('') // Clear pin on error

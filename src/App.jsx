@@ -187,8 +187,29 @@ const getPageInfo = (pathname) => {
   }
 }
 
+// Protected Route Component
+function ProtectedRoute({ children, permission, fallback = null }) {
+  const { hasPermission } = useAuth()
+  
+  if (!hasPermission(permission)) {
+    return fallback || (
+      <div className="flex flex-1 flex-col items-center justify-center p-8">
+        <div className="text-center">
+          <Monitor className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Access Restricted</h2>
+          <p className="text-muted-foreground">
+            You don't have permission to access this page.
+          </p>
+        </div>
+      </div>
+    )
+  }
+  
+  return children
+}
+
 function AuthenticatedApp() {
-  const { user, loading } = useAuth()
+  const { user, loading, hasPermission } = useAuth()
   const location = useLocation()
   const pageInfo = getPageInfo(location.pathname)
 
@@ -227,7 +248,11 @@ function AuthenticatedApp() {
             <Route path="/urls/:id/results" element={<URLDetail />} />
             <Route path="/quick-testing" element={<QuickTesting />} />
             <Route path="/quick-testing/:id/results" element={<QuickTestResult />} />
-            <Route path="/api-monitoring" element={<APIMonitoring />} />
+            <Route path="/api-monitoring" element={
+              <ProtectedRoute permission="viewApiMonitoring">
+                <APIMonitoring />
+              </ProtectedRoute>
+            } />
             <Route path="/snapshots" element={<Snapshots />} />
             <Route path="/snapshots/:id/timeline" element={<ScreenshotTimeline />} />
           </Routes>
