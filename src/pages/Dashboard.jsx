@@ -319,6 +319,8 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
 
   // Speedometer Component using shadcn Radial Chart
   const SpeedometerChart = React.memo(({ score, analysisDate }) => {
+    console.log('🔄 SpeedometerChart render:', { score, analysisDate })
+    
     const [animatedScore, setAnimatedScore] = useState(0)
     const previousScoreRef = useRef(null)
     const hasInitializedRef = useRef(false)
@@ -326,8 +328,17 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     
     // Only animate when score actually changes, not on re-renders
     useEffect(() => {
+      console.log('🎯 SpeedometerChart useEffect triggered:', {
+        actualScore,
+        previousScore: previousScoreRef.current,
+        hasInitialized: hasInitializedRef.current,
+        currentAnimatedScore: animatedScore
+      })
+      
       // Check if this is the first mount or if score has actually changed
       if (!hasInitializedRef.current || previousScoreRef.current !== actualScore) {
+        console.log('🚀 Starting animation for score:', actualScore)
+        
         // Only reset to 0 if this is not the initial mount with the same score
         if (hasInitializedRef.current) {
           setAnimatedScore(0) // Reset to 0 first for score changes
@@ -340,6 +351,8 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         }, hasInitializedRef.current ? 200 : 50) // Faster initial animation
         
         return () => clearTimeout(timer)
+      } else {
+        console.log('🛑 Skipping animation - no change needed')
       }
     }, [actualScore])
     
