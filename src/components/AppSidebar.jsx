@@ -7,7 +7,8 @@ import {
   Zap,
   Target,
   Monitor,
-  FileSearch
+  FileSearch,
+  Github
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import { useState } from "react"
@@ -112,12 +113,18 @@ const monitoringItems = [
   },
 ]
 
-// Performance section items
-const performanceItems = [
+// Admin section items
+const adminItems = [
   {
     title: "API Monitoring",
     url: "/api-monitoring",
     icon: Monitor,
+  },
+  {
+    title: "GitHub Repo",
+    url: "https://github.com/craviart/luna",
+    icon: Github,
+    external: true,
   },
 ]
 
@@ -267,11 +274,11 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Performance</SidebarGroupLabel>
+          <SidebarGroupLabel>Admin</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <TooltipProvider>
-                {performanceItems.filter(item => {
+                {adminItems.filter(item => {
                   // Show API Monitoring only if user has permission
                   if (item.title === "API Monitoring") {
                     return hasPermission('viewApiMonitoring')
@@ -297,11 +304,23 @@ export function AppSidebar() {
                         </TooltipContent>
                       </Tooltip>
                     ) : (
-                      <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                        <Link to={item.url} onClick={handleNavigationClick}>
-                          <item.icon />
-                          <span>{item.title}</span>
-                        </Link>
+                      <SidebarMenuButton asChild isActive={!item.external && isActive(item.url)}>
+                        {item.external ? (
+                          <a 
+                            href={item.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            onClick={handleNavigationClick}
+                          >
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </a>
+                        ) : (
+                          <Link to={item.url} onClick={handleNavigationClick}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </Link>
+                        )}
                       </SidebarMenuButton>
                     )}
                   </SidebarMenuItem>
