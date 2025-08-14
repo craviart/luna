@@ -65,8 +65,17 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
     }
   }, [cachedInsight])
 
-  // Don't render anything while loading or if no insight
+  // Don't render anything while loading, if no insight, or if rate limited
   if (loading || (!cachedInsight && !isGenerating)) {
+    return null
+  }
+
+  // Hide card for rate limited or configuration error states
+  if (cachedInsight && (
+    cachedInsight.includes('AI insights are rate limited') ||
+    cachedInsight.includes('AI insights need configuration') ||
+    cachedInsight.includes('Performance insights are temporarily unavailable')
+  )) {
     return null
   }
 
