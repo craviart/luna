@@ -362,6 +362,11 @@ export default function URLDetail() {
         .eq('id', id)
         .single()
 
+      if (urlError) {
+        console.error('Error loading URL:', urlError)
+        throw urlError
+      }
+
       // Get analyses for this URL with time range filtering
       const { start, end } = getDateRange()
       const { data: analysesData, error: analysesError } = await supabase
@@ -372,12 +377,40 @@ export default function URLDetail() {
         .lte('created_at', end)
         .order('created_at', { ascending: false })
 
-      if (!urlError && !analysesError) {
-        setUrl(urlData)
-        setAnalyses(analysesData || [])
+      if (analysesError) {
+        console.error('Error loading analyses:', analysesError)
+        throw analysesError
+      }
+
+      // If no analyses found in time range, try loading all analyses
+      let finalAnalysesData = analysesData
+      if (!analysesData || analysesData.length === 0) {
+        console.log('No analyses found in time range, loading all analyses...')
+        const { data: allAnalysesData, error: allAnalysesError } = await supabase
+          .from('analysis_results')
+          .select('id, created_at, success, fcp_time, lcp_time, performance_score, url_id, load_time, status, title, speed_index, total_blocking_time, cumulative_layout_shift')
+          .eq('url_id', id)
+          .order('created_at', { ascending: false })
+          .limit(50) // Limit to last 50 for performance
+        
+        if (!allAnalysesError) {
+          finalAnalysesData = allAnalysesData
+        }
+      }
+
+      console.log('URLDetail loaded:', {
+        url: urlData,
+        analyses: finalAnalysesData,
+        timeRange,
+        dateRange: { start, end },
+        analysesCount: finalAnalysesData?.length || 0
+      })
+
+      setUrl(urlData)
+      setAnalyses(finalAnalysesData || [])
         
         // Prepare chart data for performance evolution
-        const successfulAnalyses = (analysesData || []).filter(a => a.success)
+        const successfulAnalyses = (finalAnalysesData || []).filter(a => a.success)
         const chartDataPoints = successfulAnalyses
           .slice(0, 30) // Last 30 analyses
           .reverse() // Chronological order
@@ -406,9 +439,9 @@ export default function URLDetail() {
         console.log('Chart data prepared:', chartDataPoints)
         console.log('Chart data length:', chartDataPoints.length)
         setChartData(chartDataPoints)
-      }
     } catch (error) {
       console.error('Error loading data:', error)
+      toast.error('Failed to load analysis data: ' + error.message)
     } finally {
       setLoading(false)
     }
