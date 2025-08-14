@@ -630,7 +630,6 @@ Focus on the most important insight: overall health, concerning trends, specific
         <AIInsights 
           cachedInsight={cachedInsight}
           isGenerating={insightLoading}
-          onRefresh={() => generateAIInsight(monitoredUrls)}
           loading={loading}
         />
 
