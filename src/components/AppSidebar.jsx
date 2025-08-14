@@ -331,10 +331,10 @@ export function AppSidebar() {
             {/* Version Info */}
             <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border/50 mt-2">
               <div className="mb-1">
-                <span>Version v0.4.0-beta</span>
+                <span>Version v0.5.0-beta</span>
               </div>
               <div className="text-[10px] text-muted-foreground/70 mb-2">
-                Changelog page & admin sidebar updates
+                AI-powered performance insights
               </div>
               <Link 
                 to="/changelog" 
