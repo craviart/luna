@@ -57,8 +57,8 @@ export default function QuickTesting() {
   }
 
   // Colored Badge Component
-  const ColoredBadge = ({ value, color, children }) => (
-    <Badge variant="outline" className="flex items-center gap-1">
+  const ColoredBadge = ({ value, color, children, variant = "ghost" }) => (
+    <Badge variant={variant} className={`flex items-center gap-1 text-base ${variant === "ghost" ? "border-0" : ""}`}>
       <div 
         className="w-2 h-2 rounded-full" 
         style={{ backgroundColor: color }}
@@ -295,25 +295,25 @@ export default function QuickTesting() {
 
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="max-w-7xl mx-auto w-full">
+    <div className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Quick Testing</h1>
-            <p className="text-muted-foreground">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Quick Testing</h1>
+            <p className="text-muted-foreground text-sm sm:text-base">
               Run one-time performance analysis on any website
             </p>
           </div>
         </div>
 
         {/* Quick Test Form */}
-        <Card className="mb-12">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">
+        <Card>
+        <CardHeader className="text-center p-4 sm:p-6 lg:p-8">
+          <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
             Test Any URL
           </CardTitle>
-          <CardDescription className="mt-2 text-lg text-muted-foreground">
+          <CardDescription className="mt-2 text-base sm:text-lg text-muted-foreground">
             Run a one-time performance analysis on any website. Results include FCP, LCP, and Performance Score.
           </CardDescription>
         </CardHeader>
@@ -375,13 +375,12 @@ export default function QuickTesting() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Performance</TableHead>
-                    <TableHead>FCP</TableHead>
-                    <TableHead>LCP</TableHead>
-
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="min-w-48">URL</TableHead>
+                    <TableHead className="min-w-24">Performance</TableHead>
+                    <TableHead className="min-w-20">FCP</TableHead>
+                    <TableHead className="min-w-20">LCP</TableHead>
+                    <TableHead className="min-w-24">Date</TableHead>
+                    <TableHead className="min-w-24">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

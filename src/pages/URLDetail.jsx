@@ -18,7 +18,8 @@ import {
   Loader2,
   FileCode,
   Edit2,
-  Trash2
+  Trash2,
+  Info
 } from 'lucide-react'
 import NumberFlow from '@number-flow/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
@@ -62,10 +63,15 @@ import {
   ChartLegend, 
   ChartLegendContent 
 } from '../components/ui/chart'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../components/ui/hover-card'
 
 // Google PageSpeed Insights color coding for Core Web Vitals
 // Clean URL display function - remove protocol and www for cooler look
@@ -600,7 +606,7 @@ export default function URLDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto p-8">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
             <p className="text-muted-foreground">Loading analysis results...</p>
@@ -613,7 +619,7 @@ export default function URLDetail() {
   if (!url) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto p-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <XCircle className="h-16 w-16 text-muted-foreground mb-4" />
@@ -714,52 +720,55 @@ export default function URLDetail() {
             </div>
             <div className="mt-4 lg:mt-0">
               {/* Time Range Selector and Action Buttons */}
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                 <TimeRangeSelector 
                   value={timeRange} 
                   onValueChange={setTimeRange}
                 />
-                {/* Action Buttons - Delete, Edit, Run Analysis in same line */}
-                <div className="flex items-center gap-2">
-                <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Delete
+                {/* Action Buttons - Delete, Edit inline, Run Analysis full width on mobile */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete this 
+                            monitored page and all its analysis history from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteUrl}>
+                            Delete Forever
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <Button variant="outline" size="sm" onClick={handleEditTitle}>
+                      Edit Title
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete this 
-                        monitored page and all its analysis history from our servers.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteUrl}>
-                        Delete Forever
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                <Button variant="outline" size="sm" onClick={handleEditTitle}>
-                  Edit Title
-                </Button>
-                <Button 
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing}
-                  size="sm"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    'Run New Analysis'
-                  )}
-                </Button>
+                  </div>
+                  <Button 
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                    size="sm"
+                    className="w-full lg:w-auto"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      'Run New Analysis'
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -775,8 +784,35 @@ export default function URLDetail() {
               {/* First Contentful Paint Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     First Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                          <div className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span>Good: ≤ 1.8s</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <span>Needs Improvement: 1.8s - 3.0s</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                              <span>Poor: > 3.0s</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     Loading speed over time (lower is better)
@@ -787,7 +823,7 @@ export default function URLDetail() {
                     config={{
                       fcp_time: {
                         label: "FCP Time",
-                        color: "hsl(0, 0%, 15%)",
+                        color: "hsl(221, 83%, 53%)",
                       }
                     }} 
                     className="h-[250px] w-full"
@@ -819,13 +855,14 @@ export default function URLDetail() {
                           'FCP Time'
                         ]}
                       />
+                      <ChartLegend content={<ChartLegendContent />} />
                       <Line
                         type="monotone"
                         dataKey="fcp_time"
-                        stroke="hsl(0, 0%, 15%)"
+                        stroke="hsl(221, 83%, 53%)"
                         strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        dot={false}
+                        activeDot={{ r: 6, fill: "hsl(221, 83%, 53%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
                     </ResponsiveContainer>
@@ -836,8 +873,35 @@ export default function URLDetail() {
               {/* Largest Contentful Paint Chart */}
               <Card>
                 <CardHeader>
-                  <CardTitle>
+                  <CardTitle className="flex items-center gap-2">
                     Largest Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                          <div className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span>Good: ≤ 2.5s</span>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                              <span>Needs Improvement: 2.5s - 4.0s</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                              <span>Poor: > 4.0s</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </CardTitle>
                   <CardDescription>
                     Main content loading time (lower is better)
@@ -848,7 +912,7 @@ export default function URLDetail() {
                     config={{
                       lcp_time: {
                         label: "LCP Time",
-                        color: "hsl(0, 0%, 25%)",
+                        color: "hsl(212, 95%, 68%)",
                       }
                     }} 
                     className="h-[250px] w-full"
@@ -880,13 +944,14 @@ export default function URLDetail() {
                           'LCP Time'
                         ]}
                       />
+                      <ChartLegend content={<ChartLegendContent />} />
                       <Line
                         type="monotone"
                         dataKey="lcp_time"
-                        stroke="hsl(0, 0%, 25%)"
+                        stroke="hsl(212, 95%, 68%)"
                         strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        dot={false}
+                        activeDot={{ r: 6, fill: "hsl(212, 95%, 68%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
                     </ResponsiveContainer>
@@ -909,7 +974,7 @@ export default function URLDetail() {
                     config={{
                       performance_score: {
                         label: "Performance Score",
-                        color: "hsl(0, 0%, 35%)",
+                        color: "hsl(216, 87%, 45%)",
                       }
                     }} 
                     className="h-[250px] w-full"
@@ -942,13 +1007,14 @@ export default function URLDetail() {
                           'Performance Score'
                         ]}
                       />
+                      <ChartLegend content={<ChartLegendContent />} />
                       <Line
                         type="monotone"
                         dataKey="performance_score"
-                        stroke="hsl(0, 0%, 35%)"
+                        stroke="hsl(216, 87%, 45%)"
                         strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        dot={false}
+                        activeDot={{ r: 6, fill: "hsl(216, 87%, 45%)", stroke: "#fff", strokeWidth: 2 }}
                       />
                       </LineChart>
                     </ResponsiveContainer>
@@ -978,12 +1044,46 @@ export default function URLDetail() {
                 rawValue={latestAnalysis.performance_score || 0}
               />
               <MetricCard
-                title="First Contentful Paint"
+                title={
+                  <div className="flex items-center gap-2">
+                    First Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                }
                 value={formatTime(latestAnalysis.fcp_time)}
                 trend={trends.fcpTime}
               />
               <MetricCard
-                title="Largest Contentful Paint"
+                title={
+                  <div className="flex items-center gap-2">
+                    Largest Contentful Paint
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                          <p className="text-sm text-muted-foreground">
+                            LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                          </p>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                }
                 value={formatTime(latestAnalysis.lcp_time)}
                 trend={trends.lcpTime}
               />

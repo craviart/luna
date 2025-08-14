@@ -22,10 +22,16 @@ import {
   TestTube,
   ExternalLink,
   Loader2,
-  Trash2
+  Trash2,
+  Info
 } from 'lucide-react'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '../components/ui/hover-card'
 
 // Clean URL display function - remove protocol and www for cooler look
 const cleanUrl = (url) => {
@@ -165,8 +171,8 @@ export default function QuickTestResult() {
   }
 
   // Colored Badge Component
-  const ColoredBadge = ({ value, color, children }) => (
-    <Badge variant="outline" className="flex items-center gap-1">
+  const ColoredBadge = ({ value, color, children, variant = "ghost" }) => (
+    <Badge variant={variant} className={`flex items-center gap-1 text-base ${variant === "ghost" ? "border-0" : ""}`}>
       <div 
         className="w-2 h-2 rounded-full" 
         style={{ backgroundColor: color }}
@@ -274,7 +280,24 @@ export default function QuickTestResult() {
           />
           
           <MetricCard
-            title="First Contentful Paint"
+            title={
+              <div className="flex items-center gap-2">
+                First Contentful Paint
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">First Contentful Paint (FCP)</h4>
+                      <p className="text-sm text-muted-foreground">
+                        FCP measures the time from when the page starts loading to when any part of the page's content is rendered on the screen.
+                      </p>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+            }
             value={formatTime(quickTest.fcp_time)}
             icon={Activity}
             description="Time to first content"
@@ -282,7 +305,24 @@ export default function QuickTestResult() {
           />
           
           <MetricCard
-            title="Largest Contentful Paint"
+            title={
+              <div className="flex items-center gap-2">
+                Largest Contentful Paint
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Largest Contentful Paint (LCP)</h4>
+                      <p className="text-sm text-muted-foreground">
+                        LCP measures the time from when the page starts loading to when the largest text block or image element is rendered on the screen.
+                      </p>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+            }
             value={formatTime(quickTest.lcp_time)}
             icon={Activity}
             description="Time to largest content"

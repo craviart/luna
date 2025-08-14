@@ -17,6 +17,12 @@ module.exports = {
   		}
   	},
   	extend: {
+  		spacing: {
+  			'18': '4.5rem',   // 72px
+  			'22': '5.5rem',   // 88px
+  			'26': '6.5rem',   // 104px
+  			'30': '7.5rem',   // 120px
+  		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
