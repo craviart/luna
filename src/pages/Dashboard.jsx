@@ -57,6 +57,8 @@ export default function Dashboard() {
   })
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('7d')
+  const [cachedInsight, setCachedInsight] = useState('')
+  const [insightLoading, setInsightLoading] = useState(false)
 
   // Helper function to get date range based on selected time range
   const getDateRange = () => {
@@ -161,7 +163,106 @@ export default function Dashboard() {
       .replace(/^www\./, '')       // Remove www.
   }
 
+  // Generate AI insights when data changes
+  const generateAIInsight = async (urlsData) => {
+    try {
+      setInsightLoading(true)
+      
+      // Prepare data for AI analysis
+      const sites = urlsData.filter(url => url.latestAnalysis?.performance_score > 0).map(url => ({
+        name: url.name || 'Unknown Site',
+        score: url.latestAnalysis?.performance_score || 0,
+        fcp: url.latestAnalysis?.fcp_time || 0,
+        lcp: url.latestAnalysis?.lcp_time || 0,
+      }))
 
+      if (sites.length === 0) {
+        setCachedInsight("Add monitored pages to track how performance impacts your conversion rates and revenue.")
+        return
+      }
+
+      // Calculate trends
+      const avgScore = Math.round(sites.reduce((sum, s) => sum + s.score, 0) / sites.length)
+      const goodSites = sites.filter(s => s.score >= 90).length
+      const poorSites = sites.filter(s => s.score < 50).length
+      const avgFCP = Math.round(sites.reduce((sum, s) => sum + s.fcp, 0) / sites.length)
+      const avgLCP = Math.round(sites.reduce((sum, s) => sum + s.lcp, 0) / sites.length)
+
+      // Add randomization to get different insights each time
+      const focusAreas = [
+        "conversion rate optimization and revenue impact",
+        "user experience and customer satisfaction", 
+        "technical performance thresholds and Core Web Vitals",
+        "competitive advantage through faster loading times",
+        "mobile performance and mobile commerce impact",
+        "bounce rate reduction and engagement metrics"
+      ]
+      
+      const perspectives = [
+        "from a business strategy standpoint",
+        "from a technical optimization perspective", 
+        "from a user experience angle",
+        "from a revenue generation viewpoint",
+        "from a competitive positioning perspective"
+      ]
+      
+      const randomFocus = focusAreas[Math.floor(Math.random() * focusAreas.length)]
+      const randomPerspective = perspectives[Math.floor(Math.random() * perspectives.length)]
+      const timestamp = Date.now()
+      const randomSeed = Math.floor(Math.random() * 10000)
+
+      const prompt = `You are a front-end developer and web performance expert working for an ecommerce website. You're responsible for helping people understand how performance directly impacts conversion rates and business success. As an engineer, provide precise technical insights while emphasizing business impact.
+
+IMPORTANT: Generate a completely unique response each time. Do not repeat previous responses.
+
+Current timestamp: ${timestamp}
+Analysis ID: ${randomSeed}
+Focus: ${randomFocus}
+Perspective: ${randomPerspective}
+
+Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes:
+
+SITES PERFORMANCE:
+${sites.map(site => 
+  `• ${site.name}: ${site.score}/100 (FCP: ${site.fcp}ms, LCP: ${site.lcp}ms)`
+).join('\n')}
+
+SUMMARY:
+• Time period: ${timeRange}
+• Average score: ${avgScore}/100
+• Sites performing well (90+): ${goodSites}
+• Sites needing attention (<50): ${poorSites}
+• Average FCP: ${avgFCP}ms
+• Average LCP: ${avgLCP}ms
+
+Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wording and structure than any previous response. Be technically precise but emphasize business impact.`
+
+      // Call AI API
+      const response = await fetch('/api/ai-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        if (result.success && result.insight) {
+          setCachedInsight(result.insight)
+        } else {
+          throw new Error('AI service returned no insight')
+        }
+      } else {
+        throw new Error('AI service unavailable')
+      }
+
+    } catch (error) {
+      console.error('AI insight generation failed:', error)
+      // Simple fallback without excessive variations
+      setCachedInsight("Performance insights are temporarily unavailable. Your current metrics show areas for ecommerce optimization.")
+    } finally {
+      setInsightLoading(false)
+    }
+  }
 
   // Speedometer Component using shadcn Radial Chart
   const SpeedometerChart = ({ score, analysisDate }) => {
@@ -491,6 +592,11 @@ export default function Dashboard() {
       setMonitoredUrls(processedUrls)
       setAllAnalyses(combinedAnalyses)
       setChartData(processedChartData)
+
+      // Generate AI insights when data is loaded (only if we have sites with data)
+      if (processedUrls.length > 0) {
+        generateAIInsight(processedUrls)
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error)
     } finally {
@@ -533,8 +639,8 @@ export default function Dashboard() {
 
         {/* AI Performance Insights */}
         <AIInsights 
-          performanceData={monitoredUrls}
-          timeRange={timeRange}
+          cachedInsight={cachedInsight}
+          isGenerating={insightLoading}
           loading={loading}
         />
 
