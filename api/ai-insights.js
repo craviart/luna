@@ -41,7 +41,7 @@ export default async function handler(req, res) {
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.9, // Increase randomness
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 200, // Keep it concise

@@ -112,11 +112,27 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
       
       const randomFocus = focusAreas[Math.floor(Math.random() * focusAreas.length)]
       const randomPerspective = perspectives[Math.floor(Math.random() * perspectives.length)]
-      const randomSeed = Math.floor(Math.random() * 1000)
+      const timestamp = Date.now()
+      const randomSeed = Math.floor(Math.random() * 10000)
+
+      // Log the randomization for debugging
+      console.log('AI Insight Generation:', {
+        randomFocus,
+        randomPerspective,
+        randomSeed,
+        timestamp
+      })
 
       const prompt = `You are a front-end developer and web performance expert working for an ecommerce website. You're responsible for helping people understand how performance directly impacts conversion rates and business success. As an engineer, provide precise technical insights while emphasizing business impact.
 
-Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes, focusing specifically on: ${randomFocus} ${randomPerspective}.
+IMPORTANT: Generate a completely unique response each time. Do not repeat previous responses.
+
+Current timestamp: ${timestamp}
+Analysis ID: ${randomSeed}
+Focus: ${randomFocus}
+Perspective: ${randomPerspective}
+
+Analyze this ecommerce website performance data and provide 1-2 sentences that connect technical metrics to business outcomes:
 
 SITES PERFORMANCE:
 ${sites.map(site => 
@@ -131,7 +147,7 @@ SUMMARY:
 • Average FCP: ${avgFCP}ms
 • Average LCP: ${avgLCP}ms
 
-Provide a unique insight each time with fresh wording. Be technically precise but emphasize business impact. Reference specific thresholds (FCP <1.8s, LCP <2.5s) when relevant. Analysis ID: ${randomSeed}`
+Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wording and structure than any previous response. Be technically precise but emphasize business impact.`
 
       // Call AI API
       const response = await fetch('/api/ai-insights', {
@@ -142,6 +158,11 @@ Provide a unique insight each time with fresh wording. Be technically precise bu
 
       if (response.ok) {
         const result = await response.json()
+        console.log('AI Response received:', {
+          success: result.success,
+          insightPreview: result.insight?.substring(0, 50) + '...',
+          timestamp: new Date().toISOString()
+        })
         if (result.success && result.insight) {
           setInsight(result.insight)
           setAnimationKey(prev => prev + 1)
@@ -149,6 +170,7 @@ Provide a unique insight each time with fresh wording. Be technically precise bu
           throw new Error('AI service returned no insight')
         }
       } else {
+        console.error('AI API failed:', response.status, response.statusText)
         throw new Error('AI service unavailable')
       }
 
