@@ -60,10 +60,15 @@ export default function AIInsights({ performanceData, timeRange, loading }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [animationKey, setAnimationKey] = useState(0)
 
-  // Generate insight when performance data changes
+  // Generate insight when performance data changes (with delay to avoid rate limits)
   useEffect(() => {
     if (performanceData && performanceData.length > 0 && !loading) {
-      generateInsight()
+      // Add a small delay to avoid hitting rate limits on rapid refreshes
+      const timer = setTimeout(() => {
+        generateInsight()
+      }, 1000) // 1 second delay
+      
+      return () => clearTimeout(timer)
     }
   }, [performanceData, timeRange, loading])
 
@@ -171,7 +176,11 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
         }
       } else {
         console.error('AI API failed:', response.status, response.statusText)
-        throw new Error('AI service unavailable')
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded - using fallback insight')
+        } else {
+          throw new Error('AI service unavailable')
+        }
       }
 
     } catch (error) {
@@ -185,11 +194,16 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     }
   }
 
-  // Generate fallback insight with ecommerce performance focus
+  // Generate fallback insight with ecommerce performance focus and randomization
   const generateFallbackInsight = () => {
     const sites = performanceData.filter(url => url.latestAnalysis?.performance_score > 0)
     if (sites.length === 0) {
-      return "Add monitored pages to track how performance impacts your conversion rates and revenue."
+      const emptyMessages = [
+        "Add monitored pages to track how performance impacts your conversion rates and revenue.",
+        "Start monitoring pages to understand performance's impact on ecommerce success.",
+        "Set up page monitoring to optimize conversion rates through performance insights."
+      ]
+      return emptyMessages[Math.floor(Math.random() * emptyMessages.length)]
     }
 
     const avgScore = Math.round(sites.reduce((sum, s) => sum + s.latestAnalysis.performance_score, 0) / sites.length)
@@ -198,14 +212,39 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     const avgFCP = Math.round(sites.reduce((sum, s) => sum + (s.latestAnalysis?.fcp_time || 0), 0) / sites.length)
     const avgLCP = Math.round(sites.reduce((sum, s) => sum + (s.latestAnalysis?.lcp_time || 0), 0) / sites.length)
 
+    // Randomized fallback insights
+    const goodPerformanceInsights = [
+      `Excellent performance! Your ${avgScore}/100 average score with FCP under 1.8s optimizes for maximum conversion rates.`,
+      `Strong performance metrics at ${avgScore}/100 - your fast loading times support optimal ecommerce conversion rates.`,
+      `Your ${avgScore}/100 performance score puts you in the top tier for user experience and conversion optimization.`
+    ]
+
+    const poorPerformanceInsights = [
+      `${poorSites} page${poorSites > 1 ? 's have' : ' has'} scores below 50, potentially reducing conversion rates by up to 20%. Prioritize Core Web Vitals optimization.`,
+      `Performance issues on ${poorSites} page${poorSites > 1 ? 's' : ''} could be costing you conversions - focus on optimizing loading times for revenue impact.`,
+      `${poorSites} underperforming page${poorSites > 1 ? 's need' : ' needs'} attention - slow loading times directly impact ecommerce success rates.`
+    ]
+
+    const slowVitalsInsights = [
+      `FCP at ${(avgFCP/1000).toFixed(1)}s or LCP at ${(avgLCP/1000).toFixed(1)}s may impact conversion rates. Target FCP <1.8s and LCP <2.5s for optimal ecommerce performance.`,
+      `Loading times of ${(avgLCP/1000).toFixed(1)}s LCP could reduce mobile conversions - aim for sub-2.5s for better ecommerce results.`,
+      `Your ${(avgFCP/1000).toFixed(1)}s FCP suggests room for conversion optimization through faster Core Web Vitals performance.`
+    ]
+
+    const generalInsights = [
+      `${avgScore}/100 performance score indicates room for conversion rate optimization through faster Core Web Vitals.`,
+      `Performance score of ${avgScore}/100 suggests potential for improved conversion rates with targeted optimization.`,
+      `Current ${avgScore}/100 score leaves opportunity for revenue growth through enhanced page speed performance.`
+    ]
+
     if (avgScore >= 80 && avgFCP <= 1800 && avgLCP <= 2500) {
-      return `Excellent performance! Your ${avgScore}/100 average score with FCP under 1.8s optimizes for maximum conversion rates.`
+      return goodPerformanceInsights[Math.floor(Math.random() * goodPerformanceInsights.length)]
     } else if (poorSites > 0) {
-      return `${poorSites} page${poorSites > 1 ? 's have' : ' has'} scores below 50, potentially reducing conversion rates by up to 20%. Prioritize Core Web Vitals optimization.`
+      return poorPerformanceInsights[Math.floor(Math.random() * poorPerformanceInsights.length)]
     } else if (avgFCP > 1800 || avgLCP > 2500) {
-      return `FCP at ${(avgFCP/1000).toFixed(1)}s or LCP at ${(avgLCP/1000).toFixed(1)}s may impact conversion rates. Target FCP <1.8s and LCP <2.5s for optimal ecommerce performance.`
+      return slowVitalsInsights[Math.floor(Math.random() * slowVitalsInsights.length)]
     } else {
-      return `${avgScore}/100 performance score indicates room for conversion rate optimization through faster Core Web Vitals.`
+      return generalInsights[Math.floor(Math.random() * generalInsights.length)]
     }
   }
 
