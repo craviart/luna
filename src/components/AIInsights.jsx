@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent } from './ui/card'
 import AIWriter from 'react-aiwriter'
 
@@ -57,13 +57,15 @@ const BlackLoader = () => (
 
 export default function AIInsights({ cachedInsight, isGenerating, loading }) {
   const [animationKey, setAnimationKey] = useState(0)
+  const [currentInsight, setCurrentInsight] = useState('')
 
-  // Force re-render of AIWriter when cached insight changes
+  // Only update animation when the actual insight content changes
   useEffect(() => {
-    if (cachedInsight) {
+    if (cachedInsight && cachedInsight !== currentInsight) {
+      setCurrentInsight(cachedInsight)
       setAnimationKey(prev => prev + 1)
     }
-  }, [cachedInsight])
+  }, [cachedInsight, currentInsight])
 
   // Don't render anything while loading or if no insight
   if (loading || (!cachedInsight && !isGenerating)) {
@@ -85,15 +87,17 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
             }}
             className="sm:text-3xl text-2xl leading-relaxed"
           >
-            <AIWriter
-              key={animationKey}
-              delay={80} // 80ms between characters to match ChatGPT's natural pace
-              onFinish={() => {
-                console.log('AI insight typing completed')
-              }}
-            >
-              <span>{cachedInsight}</span>
-            </AIWriter>
+            {useMemo(() => (
+              <AIWriter
+                key={`insight-${animationKey}`}
+                delay={80} // 80ms between characters to match ChatGPT's natural pace
+                onFinish={() => {
+                  console.log('AI insight typing completed')
+                }}
+              >
+                <span>{currentInsight}</span>
+              </AIWriter>
+            ), [animationKey, currentInsight])}
           </div>
         ) : null}
       </CardContent>
