@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   BarChart3, 
@@ -320,15 +320,20 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
   // Speedometer Component using shadcn Radial Chart
   const SpeedometerChart = ({ score, analysisDate }) => {
     const [animatedScore, setAnimatedScore] = useState(0)
+    const previousScoreRef = useRef(null)
     const actualScore = score || 0
     
-    // Animate from 0 to actual score on mount/change
+    // Only animate when score actually changes, not on re-renders
     useEffect(() => {
-      setAnimatedScore(0) // Reset to 0 first
-      const timer = setTimeout(() => {
-        setAnimatedScore(actualScore)
-      }, 200)
-      return () => clearTimeout(timer)
+      // Check if this is the first mount or if score has actually changed
+      if (previousScoreRef.current === null || previousScoreRef.current !== actualScore) {
+        setAnimatedScore(0) // Reset to 0 first
+        const timer = setTimeout(() => {
+          setAnimatedScore(actualScore)
+        }, 200)
+        previousScoreRef.current = actualScore
+        return () => clearTimeout(timer)
+      }
     }, [actualScore])
     
     // Chart data - desktop shows the score, mobile shows the remaining portion
