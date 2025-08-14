@@ -121,8 +121,8 @@ export default function Changelog() {
               title="New Features"
               items={[
                 "Role-based Access Control (RBAC) system with Admin and Viewer profiles",
-                "Admin profile (PIN: 2609) with full management capabilities",
-                "Viewer profile (PIN: 1905) with read-only access and restricted actions",
+                "Admin profile with full management capabilities",
+                "Viewer profile with read-only access and restricted actions",
                 "Dynamic role display in sidebar footer showing current user role",
                 "ProtectedRoute component for route-level access control",
                 "Permission-based UI rendering with hasPermission() utility",
