@@ -177,7 +177,7 @@ export function AppSidebar() {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Monitoring</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <TooltipProvider>
@@ -254,8 +254,7 @@ export function AppSidebar() {
             
             {/* Version Info */}
             <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border/50 mt-2">
-              <div className="flex items-center gap-2 mb-1">
-                <Target className="h-3 w-3" />
+              <div className="mb-1">
                 <span>Version v0.1.0-beta</span>
               </div>
               <div className="text-[10px] text-muted-foreground/70">

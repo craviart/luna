@@ -720,20 +720,19 @@ export default function URLDetail() {
             </div>
             <div className="mt-4 lg:mt-0">
               {/* Time Range Selector and Action Buttons */}
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-2">
                 <TimeRangeSelector 
                   value={timeRange} 
                   onValueChange={setTimeRange}
                 />
-                {/* Action Buttons - Delete, Edit inline, Run Analysis full width on mobile */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
+                {/* Action Buttons - All same size on desktop */}
+                <div className="flex flex-col lg:flex-row gap-2">
+                  <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="lg:w-auto">
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -750,15 +749,14 @@ export default function URLDetail() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                    <Button variant="outline" size="sm" onClick={handleEditTitle}>
-                      Edit Title
-                    </Button>
-                  </div>
+                  <Button variant="outline" size="sm" onClick={handleEditTitle} className="lg:w-auto">
+                    Edit Title
+                  </Button>
                   <Button 
                     onClick={handleAnalyze}
                     disabled={isAnalyzing}
                     size="sm"
-                    className="w-full lg:w-auto"
+                    className="lg:w-auto"
                   >
                     {isAnalyzing ? (
                       <>
