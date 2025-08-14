@@ -72,6 +72,61 @@ export default function Changelog() {
         {/* Changelog Entries */}
         <div className="space-y-8">
           <ChangelogEntry
+            version="v0.5.0-beta"
+            date="August 15, 2025"
+            title="AI-Powered Performance Insights"
+            description="Intelligent performance analysis powered by Google Gemini AI with seamless user experience and business-focused insights for ecommerce optimization."
+          >
+            <ChangeSection
+              title="New Features"
+              items={[
+                "AI-powered performance insights using Google Gemini Flash",
+                "Business-focused analysis connecting technical metrics to conversion rates",
+                "Randomized perspectives for varied insights on each dashboard load",
+                "Beautiful typing animation using react-aiwriter library",
+                "Seamless UX - card only appears when insights are successfully generated",
+                "Ecommerce-specific performance recommendations and impact analysis"
+              ]}
+            />
+
+            <ChangeSection
+              title="Technical Improvements"
+              items={[
+                "Smart caching system - insights generated when dashboard data changes",
+                "Exponential backoff retry logic for API rate limit handling",
+                "2-second initial delay to prevent rapid API calls",
+                "Robust error handling with graceful fallbacks",
+                "Clean component architecture with proper state management",
+                "Integration with Vercel environment variables for API key management"
+              ]}
+            />
+
+            <ChangeSection
+              title="User Experience Enhancements"
+              items={[
+                "Hidden loading states - no visual noise when AI is unavailable", 
+                "No error messages or placeholders shown to users",
+                "Card appears smoothly only with valuable content",
+                "ChatGPT-style character-by-character typing animation",
+                "Responsive font sizing (20px mobile, 32px desktop)",
+                "Completely invisible when AI services are rate limited or unavailable"
+              ]}
+            />
+
+            <ChangeSection
+              title="AI Integration"
+              items={[
+                "Google Gemini Flash API integration with temperature 0.9 for creativity",
+                "Performance-focused prompt engineering for ecommerce insights",
+                "Randomized focus areas (conversion, UX, technical, competitive, mobile)",
+                "Multiple perspective angles (business, technical, revenue, competitive)",
+                "Timestamp and random seed injection for unique responses",
+                "Rate limit protection with intelligent retry mechanisms"
+              ]}
+            />
+          </ChangelogEntry>
+
+          <ChangelogEntry
             version="v0.4.0-beta"
             date="August 14, 2025"
             title="Changelog Page & Admin Sidebar Updates"
