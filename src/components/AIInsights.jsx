@@ -74,12 +74,10 @@ export default function AIInsights({ cachedInsight, isGenerating, loading }) {
 
   return (
     <Card className="relative overflow-hidden">
-      <CardContent className="p-6 min-h-[244px] sm:min-h-[180px] flex flex-col justify-center">
+      <CardContent className="p-6">
         <div className="w-full">
           {isGenerating ? (
-            <div className="flex items-center justify-center h-full">
-              <BlackLoader />
-            </div>
+            <BlackLoader />
           ) : currentInsight ? (
             <div 
               className="text-[20px] leading-[1.5] sm:text-[32px] sm:leading-[1.4]"
