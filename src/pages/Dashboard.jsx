@@ -252,13 +252,29 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
           throw new Error('AI service returned no insight')
         }
       } else {
-        throw new Error('AI service unavailable')
+        let errorText = ''
+        try {
+          const errorData = await response.json()
+          errorText = errorData.error || response.statusText
+        } catch {
+          errorText = response.statusText
+        }
+        console.error('AI API failed:', response.status, errorText)
+        throw new Error(`AI service unavailable: ${errorText}`)
       }
 
     } catch (error) {
       console.error('AI insight generation failed:', error)
-      // Simple fallback without excessive variations
-      setCachedInsight("Performance insights are temporarily unavailable. Your current metrics show areas for ecommerce optimization.")
+      
+      // Check if it's a configuration issue
+      if (error.message.includes('AI service not configured')) {
+        setCachedInsight("🔧 AI insights need configuration. Please add the GEMINI_API_KEY environment variable in Vercel.")
+      } else if (error.message.includes('not configured')) {
+        setCachedInsight("🔧 AI insights need configuration. Please add the GEMINI_API_KEY environment variable in Vercel.")
+      } else {
+        // Simple fallback without excessive variations
+        setCachedInsight("Performance insights are temporarily unavailable. Your current metrics show areas for ecommerce optimization.")
+      }
     } finally {
       setInsightLoading(false)
     }
