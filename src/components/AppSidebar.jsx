@@ -314,9 +314,16 @@ export function AppSidebar() {
               <div className="mb-1">
                 <span>Version v0.3.0-beta</span>
               </div>
-              <div className="text-[10px] text-muted-foreground/70">
+              <div className="text-[10px] text-muted-foreground/70 mb-2">
                 Role-based access control & bug fixes
               </div>
+              <Link 
+                to="/changelog" 
+                className="text-[10px] text-muted-foreground hover:text-foreground transition-colors duration-200 underline underline-offset-2"
+                onClick={handleNavigationClick}
+              >
+                View changelog
+              </Link>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>

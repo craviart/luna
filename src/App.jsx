@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from './components/ui/sonner'
-import { Loader2, BarChart3, Activity, Zap, Globe, Monitor } from 'lucide-react'
+import { Loader2, BarChart3, Activity, Zap, Globe, Monitor, FileText } from 'lucide-react'
 
 import { ThemeProvider } from './components/theme-provider'
 import { ThemeToggle } from './components/theme-toggle'
@@ -17,6 +17,7 @@ import QuickTestResult from './pages/QuickTestResult'
 import Snapshots from './pages/Snapshots'
 import ScreenshotTimeline from './pages/ScreenshotTimeline'
 import APIMonitoring from './pages/APIMonitoring'
+import Changelog from './pages/Changelog'
 
 // Luna taglines for the dashboard
 const lunaTaglines = [
@@ -156,6 +157,12 @@ const getPageInfo = (pathname) => {
         icon: Activity,
         isDashboard: false
       }
+    case '/changelog':
+      return {
+        title: 'Changelog',
+        icon: FileText,
+        isDashboard: false
+      }
 
     default:
       if (pathname.startsWith('/snapshots/') && pathname.endsWith('/timeline')) {
@@ -255,6 +262,7 @@ function AuthenticatedApp() {
             } />
             <Route path="/snapshots" element={<Snapshots />} />
             <Route path="/snapshots/:id/timeline" element={<ScreenshotTimeline />} />
+            <Route path="/changelog" element={<Changelog />} />
           </Routes>
         </div>
       </SidebarInset>
