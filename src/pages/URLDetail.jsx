@@ -62,7 +62,7 @@ import {
   ChartLegend, 
   ChartLegendContent 
 } from '../components/ui/chart'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import { supabase } from '../lib/supabase-simple'
 import { toast } from 'sonner'
 import { TimeRangeSelector } from '../components/TimeRangeSelector'
@@ -790,13 +790,19 @@ export default function URLDetail() {
                     config={{
                       fcp_time: {
                         label: "FCP Time",
-                        color: "hsl(0, 0%, 15%)",
+                        color: "hsl(221, 83%, 53%)",
                       }
                     }} 
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
+                      <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="fcpGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -822,15 +828,17 @@ export default function URLDetail() {
                           'FCP Time'
                         ]}
                       />
-                      <Line
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <Area
                         type="monotone"
                         dataKey="fcp_time"
-                        stroke="hsl(0, 0%, 15%)"
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        stroke="hsl(221, 83%, 53%)"
+                        strokeWidth={2}
+                        fill="url(#fcpGradient)"
+                        dot={{ r: 4, fill: "hsl(221, 83%, 53%)", strokeWidth: 2, stroke: '#fff' }}
+                        activeDot={{ r: 6, fill: "hsl(221, 83%, 53%)", strokeWidth: 2, stroke: '#fff' }}
                       />
-                      </LineChart>
+                      </AreaChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
@@ -851,13 +859,19 @@ export default function URLDetail() {
                     config={{
                       lcp_time: {
                         label: "LCP Time",
-                        color: "hsl(0, 0%, 25%)",
+                        color: "hsl(212, 95%, 68%)",
                       }
                     }} 
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
+                      <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="lcpGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -883,15 +897,17 @@ export default function URLDetail() {
                           'LCP Time'
                         ]}
                       />
-                      <Line
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <Area
                         type="monotone"
                         dataKey="lcp_time"
-                        stroke="hsl(0, 0%, 25%)"
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        stroke="hsl(212, 95%, 68%)"
+                        strokeWidth={2}
+                        fill="url(#lcpGradient)"
+                        dot={{ r: 4, fill: "hsl(212, 95%, 68%)", strokeWidth: 2, stroke: '#fff' }}
+                        activeDot={{ r: 6, fill: "hsl(212, 95%, 68%)", strokeWidth: 2, stroke: '#fff' }}
                       />
-                      </LineChart>
+                      </AreaChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>
@@ -912,13 +928,19 @@ export default function URLDetail() {
                     config={{
                       performance_score: {
                         label: "Performance Score",
-                        color: "hsl(0, 0%, 35%)",
+                        color: "hsl(216, 87%, 45%)",
                       }
                     }} 
                     className="h-[250px] w-full"
                   >
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
+                      <AreaChart data={chartData}>
+                      <defs>
+                        <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.1} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
                       <XAxis 
                         dataKey="date" 
@@ -945,15 +967,17 @@ export default function URLDetail() {
                           'Performance Score'
                         ]}
                       />
-                      <Line
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <Area
                         type="monotone"
                         dataKey="performance_score"
-                        stroke="hsl(0, 0%, 35%)"
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
-                        activeDot={{ r: 6 }}
+                        stroke="hsl(216, 87%, 45%)"
+                        strokeWidth={2}
+                        fill="url(#performanceGradient)"
+                        dot={{ r: 4, fill: "hsl(216, 87%, 45%)", strokeWidth: 2, stroke: '#fff' }}
+                        activeDot={{ r: 6, fill: "hsl(216, 87%, 45%)", strokeWidth: 2, stroke: '#fff' }}
                       />
-                      </LineChart>
+                      </AreaChart>
                     </ResponsiveContainer>
                   </ChartContainer>
                 </CardContent>

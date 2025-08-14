@@ -22,10 +22,14 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from '@/components/ui/chart'
 import {
   Line,
   LineChart,
+  AreaChart,
+  Area,
   CartesianGrid,
   ResponsiveContainer,
   XAxis,
@@ -276,27 +280,27 @@ export default function Dashboard() {
     }
   }
 
-  // Chart configurations for different metrics using highly distinctive colors
+  // Chart configurations for different metrics using blue theme colors
   const getChartConfig = (urlNames, metricType) => {
     const config = {}
-    // High-contrast, accessible color palette with maximum differentiation
-    const distinctiveColors = [
-      'hsl(220, 90%, 56%)',   // Bright blue
-      'hsl(142, 76%, 36%)',   // Green
-      'hsl(0, 84%, 60%)',     // Red
-      'hsl(262, 83%, 58%)',   // Purple
-      'hsl(45, 93%, 47%)',    // Amber/Orange
-      'hsl(332, 81%, 60%)',   // Pink
-      'hsl(195, 74%, 57%)',   // Cyan
-      'hsl(84, 81%, 44%)',    // Lime
-      'hsl(24, 95%, 53%)',    // Deep orange
-      'hsl(293, 69%, 49%)',   // Magenta
+    // Blue-themed gradient color palette inspired by shadcn/ui charts
+    const blueThemeColors = [
+      'hsl(221, 83%, 53%)',   // Primary blue
+      'hsl(212, 95%, 68%)',   // Light blue
+      'hsl(216, 87%, 45%)',   // Medium blue
+      'hsl(224, 76%, 60%)',   // Bright blue
+      'hsl(210, 40%, 55%)',   // Blue-gray
+      'hsl(199, 89%, 48%)',   // Sky blue
+      'hsl(207, 90%, 54%)',   // Azure
       'hsl(200, 98%, 39%)',   // Deep blue
-      'hsl(120, 75%, 35%)'    // Forest green
+      'hsl(215, 74%, 65%)',   // Periwinkle
+      'hsl(204, 94%, 44%)',   // Ocean blue
+      'hsl(213, 82%, 57%)',   // Royal blue
+      'hsl(208, 88%, 50%)'    // Cobalt blue
     ]
     
     urlNames.forEach((urlName, index) => {
-      const color = distinctiveColors[index % distinctiveColors.length]
+      const color = blueThemeColors[index % blueThemeColors.length]
       config[`${urlName}_${metricType}`] = {
         label: urlName,
         color: color
@@ -604,7 +608,20 @@ export default function Dashboard() {
                   config={getChartConfig(chartData.urlNames, 'performance')} 
                   className="h-[400px] w-full"
                 >
-                  <LineChart data={chartData.data}>
+                  <AreaChart data={chartData.data}>
+                    <defs>
+                      {chartData.urlNames?.map((urlName, index) => {
+                        const config = getChartConfig(chartData.urlNames, 'performance')
+                        const areaConfig = config[`${urlName}_performance`]
+                        const gradientId = `gradient-${urlName}-performance`
+                        return (
+                          <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                          </linearGradient>
+                        )
+                      })}
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
                       dataKey="date" 
@@ -622,23 +639,26 @@ export default function Dashboard() {
                       label={{ value: 'Score', angle: -90, position: 'insideLeft' }}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent />} />
                     {chartData.urlNames?.map((urlName, index) => {
                       const config = getChartConfig(chartData.urlNames, 'performance')
-                      const lineConfig = config[`${urlName}_performance`]
+                      const areaConfig = config[`${urlName}_performance`]
+                      const gradientId = `gradient-${urlName}-performance`
                       return (
-                        <Line
+                        <Area
                           key={urlName}
                           type="monotone"
                           dataKey={`${urlName}_performance`}
-                          stroke={lineConfig?.color}
-                          strokeWidth={4}
-                          dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
-                          activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
+                          stroke={areaConfig?.color}
+                          strokeWidth={2}
+                          fill={`url(#${gradientId})`}
                           connectNulls={false}
+                          dot={{ r: 4, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                          activeDot={{ r: 6, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
                         />
                       )
                     })}
-                  </LineChart>
+                  </AreaChart>
                 </ChartContainer>
               </CardContent>
             </Card>
@@ -660,7 +680,20 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'lcp')} 
                     className="h-[350px] w-full"
                   >
-                    <LineChart data={chartData.data}>
+                    <AreaChart data={chartData.data}>
+                      <defs>
+                        {chartData.urlNames?.map((urlName, index) => {
+                          const config = getChartConfig(chartData.urlNames, 'lcp')
+                          const areaConfig = config[`${urlName}_lcp`]
+                          const gradientId = `gradient-${urlName}-lcp`
+                          return (
+                            <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                            </linearGradient>
+                          )
+                        })}
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="date" 
@@ -677,23 +710,26 @@ export default function Dashboard() {
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
                       {chartData.urlNames?.map((urlName, index) => {
                         const config = getChartConfig(chartData.urlNames, 'lcp')
-                        const lineConfig = config[`${urlName}_lcp`]
+                        const areaConfig = config[`${urlName}_lcp`]
+                        const gradientId = `gradient-${urlName}-lcp`
                         return (
-                          <Line
+                          <Area
                             key={urlName}
                             type="monotone"
                             dataKey={`${urlName}_lcp`}
-                            stroke={lineConfig?.color}
-                            strokeWidth={4}
-                            dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
-                            activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
+                            stroke={areaConfig?.color}
+                            strokeWidth={2}
+                            fill={`url(#${gradientId})`}
                             connectNulls={false}
+                            dot={{ r: 4, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 6, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
                           />
                         )
                       })}
-                    </LineChart>
+                    </AreaChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
@@ -713,7 +749,20 @@ export default function Dashboard() {
                     config={getChartConfig(chartData.urlNames, 'fcp')} 
                     className="h-[350px] w-full"
                   >
-                    <LineChart data={chartData.data}>
+                    <AreaChart data={chartData.data}>
+                      <defs>
+                        {chartData.urlNames?.map((urlName, index) => {
+                          const config = getChartConfig(chartData.urlNames, 'fcp')
+                          const areaConfig = config[`${urlName}_fcp`]
+                          const gradientId = `gradient-${urlName}-fcp`
+                          return (
+                            <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor={areaConfig?.color} stopOpacity={0.3} />
+                              <stop offset="95%" stopColor={areaConfig?.color} stopOpacity={0.1} />
+                            </linearGradient>
+                          )
+                        })}
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis 
                         dataKey="date" 
@@ -730,23 +779,26 @@ export default function Dashboard() {
                         label={{ value: 'ms', angle: -90, position: 'insideLeft' }}
                       />
                       <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
                       {chartData.urlNames?.map((urlName, index) => {
                         const config = getChartConfig(chartData.urlNames, 'fcp')
-                        const lineConfig = config[`${urlName}_fcp`]
+                        const areaConfig = config[`${urlName}_fcp`]
+                        const gradientId = `gradient-${urlName}-fcp`
                         return (
-                          <Line
+                          <Area
                             key={urlName}
                             type="monotone"
                             dataKey={`${urlName}_fcp`}
-                            stroke={lineConfig?.color}
-                            strokeWidth={4}
-                            dot={{ r: 5, fill: lineConfig?.color, strokeWidth: 2, stroke: '#fff' }}
-                            activeDot={{ r: 7, fill: lineConfig?.color, strokeWidth: 3, stroke: '#fff' }}
+                            stroke={areaConfig?.color}
+                            strokeWidth={2}
+                            fill={`url(#${gradientId})`}
                             connectNulls={false}
+                            dot={{ r: 4, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 6, fill: areaConfig?.color, strokeWidth: 2, stroke: '#fff' }}
                           />
                         )
                       })}
-                    </LineChart>
+                    </AreaChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
