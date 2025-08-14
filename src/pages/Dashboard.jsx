@@ -46,101 +46,6 @@ import {
 } from '../components/ui/hover-card'
 import AIInsights from '../components/AIInsights'
 
-// Speedometer Component - moved outside Dashboard to prevent re-creation
-const SpeedometerChart = ({ score, analysisDate }) => {
-  const [animatedScore, setAnimatedScore] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const actualScore = score || 0
-  
-  // Only animate once when component mounts or score changes
-  useEffect(() => {
-    if (!isAnimating && animatedScore !== actualScore) {
-      setIsAnimating(true)
-      setAnimatedScore(0)
-      
-      const timer = setTimeout(() => {
-        setAnimatedScore(actualScore)
-        setIsAnimating(false)
-      }, 100)
-      
-      return () => clearTimeout(timer)
-    }
-  }, [actualScore, animatedScore, isAnimating])
-  
-  // Chart data
-  const chartData = [
-    {
-      month: "performance",
-      desktop: animatedScore,
-      mobile: 100 - animatedScore,
-    },
-  ]
-  
-  const getPerformanceColor = (score) => {
-    if (score >= 90) return '#10b981' // green-500
-    if (score >= 50) return '#f59e0b' // amber-500
-    return '#ef4444' // red-500
-  }
-  
-  const chartConfig = {
-    desktop: {
-      label: "Performance",
-      color: getPerformanceColor(score),
-    },
-    mobile: {
-      label: "Remaining",
-      color: "hsl(var(--muted))",
-    },
-  }
-  
-  // Format the analysis date
-  const formatAnalysisDate = (date) => {
-    if (!date) return 'No data'
-    const analysisDate = new Date(date)
-    return analysisDate.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-  
-  return (
-    <div className="mx-auto aspect-square max-h-[250px]">
-      <ChartContainer
-        config={chartConfig}
-        className="mx-auto aspect-square max-h-[250px]"
-      >
-        <RadialBarChart
-          data={chartData}
-          startAngle={180}
-          endAngle={0}
-          innerRadius={80}
-          outerRadius={140}
-        >
-          <PolarRadiusAxis tick={false} tickCount={3} axisLine={false} />
-          <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" />
-          <RadialBar dataKey="mobile" fill="hsl(var(--muted))" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
-        </RadialBarChart>
-      </ChartContainer>
-      
-      {/* Score text overlay */}
-      <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
-        <div className="text-center">
-          <div className="text-4xl font-bold">
-            <NumberFlow 
-              value={animatedScore} 
-              format={{ maximumFractionDigits: 0 }}
-              willChange
-            />
-          </div>
-          <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function Dashboard() {
   const [monitoredUrls, setMonitoredUrls] = useState([])
   const [allAnalyses, setAllAnalyses] = useState([])
@@ -412,7 +317,105 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
     }
   }
 
-
+  // Speedometer Component using shadcn Radial Chart
+  const SpeedometerChart = React.memo(({ score, analysisDate }) => {
+    const [animatedScore, setAnimatedScore] = useState(0)
+    const previousScoreRef = useRef(null)
+    const hasInitializedRef = useRef(false)
+    const actualScore = score || 0
+    
+    // Only animate when score actually changes, not on re-renders
+    useEffect(() => {
+      // Check if this is the first mount or if score has actually changed
+      if (!hasInitializedRef.current || previousScoreRef.current !== actualScore) {
+        // Only reset to 0 if this is not the initial mount with the same score
+        if (hasInitializedRef.current) {
+          setAnimatedScore(0) // Reset to 0 first for score changes
+        }
+        
+        const timer = setTimeout(() => {
+          setAnimatedScore(actualScore)
+          hasInitializedRef.current = true
+          previousScoreRef.current = actualScore
+        }, hasInitializedRef.current ? 200 : 50) // Faster initial animation
+        
+        return () => clearTimeout(timer)
+      }
+    }, [actualScore])
+    
+    // Chart data - desktop shows the score, mobile shows the remaining portion
+    const chartData = [
+      {
+        month: "performance",
+        desktop: animatedScore,
+        mobile: 100 - animatedScore, // Rest of the semicircle
+      },
+    ]
+    
+    const chartConfig = {
+      desktop: {
+        label: "Performance",
+        color: getPerformanceColor(score),
+      },
+      mobile: {
+        label: "Remaining",
+        color: "hsl(var(--muted))",
+      },
+    }
+    
+    const totalScore = animatedScore
+    
+    // Format the analysis date
+    const formatAnalysisDate = (date) => {
+      if (!date) return 'No data'
+      const analysisDate = new Date(date)
+      return analysisDate.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    }
+    
+    return (
+      <div className="mx-auto aspect-square max-h-[250px]">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[250px]"
+        >
+          <RadialBarChart
+            data={chartData}
+            startAngle={180}
+            endAngle={0}
+            innerRadius={80}
+            outerRadius={140}
+          >
+            <PolarRadiusAxis tick={false} tickCount={3} axisLine={false} />
+            <RadialBar dataKey="desktop" stackId="a" cornerRadius={5} fill={getPerformanceColor(score)} className="stroke-transparent stroke-2" />
+            <RadialBar dataKey="mobile" fill="hsl(var(--muted))" stackId="a" cornerRadius={5} className="stroke-transparent stroke-2" />
+          </RadialBarChart>
+        </ChartContainer>
+        
+        {/* Score text overlay - positioned in center */}
+        <div className="relative -mt-40 flex flex-col items-center justify-center space-y-1">
+          <div className="text-center">
+            <div className="text-4xl font-bold">
+              <NumberFlow 
+                value={animatedScore} 
+                format={{ maximumFractionDigits: 0 }}
+                willChange
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">{formatAnalysisDate(analysisDate)}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }, (prevProps, nextProps) => {
+    // Custom comparison to prevent re-renders when props haven't actually changed
+    return prevProps.score === nextProps.score && 
+           prevProps.analysisDate === nextProps.analysisDate
+  })
 
 
 
@@ -736,6 +739,7 @@ Write from the ${randomPerspective} focusing on ${randomFocus}. Use different wo
                         <div className="text-center py-2 bg-muted/50 rounded-lg">
                           <div className="text-sm text-muted-foreground mb-1">Performance Score</div>
                           <SpeedometerChart 
+                            key={`speedometer-${url.id}-${url.latestAnalysis.performance_score}`}
                             score={url.latestAnalysis.performance_score} 
                             analysisDate={url.latestAnalysis.created_at}
                           />
