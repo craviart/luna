@@ -799,7 +799,7 @@ export default function URLDetail() {
                       <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="fcpGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.3} />
+                          <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.8} />
                           <stop offset="95%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.1} />
                         </linearGradient>
                       </defs>
@@ -835,8 +835,9 @@ export default function URLDetail() {
                         stroke="hsl(221, 83%, 53%)"
                         strokeWidth={2}
                         fill="url(#fcpGradient)"
-                        dot={{ r: 4, fill: "hsl(221, 83%, 53%)", strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 6, fill: "hsl(221, 83%, 53%)", strokeWidth: 2, stroke: '#fff' }}
+                        fillOpacity={0.4}
+                        dot={false}
+                        activeDot={{ r: 4, fill: "hsl(221, 83%, 53%)", stroke: "hsl(221, 83%, 53%)" }}
                       />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -868,7 +869,7 @@ export default function URLDetail() {
                       <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="lcpGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.3} />
+                          <stop offset="5%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.8} />
                           <stop offset="95%" stopColor="hsl(212, 95%, 68%)" stopOpacity={0.1} />
                         </linearGradient>
                       </defs>
@@ -904,8 +905,9 @@ export default function URLDetail() {
                         stroke="hsl(212, 95%, 68%)"
                         strokeWidth={2}
                         fill="url(#lcpGradient)"
-                        dot={{ r: 4, fill: "hsl(212, 95%, 68%)", strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 6, fill: "hsl(212, 95%, 68%)", strokeWidth: 2, stroke: '#fff' }}
+                        fillOpacity={0.4}
+                        dot={false}
+                        activeDot={{ r: 4, fill: "hsl(212, 95%, 68%)", stroke: "hsl(212, 95%, 68%)" }}
                       />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -937,7 +939,7 @@ export default function URLDetail() {
                       <AreaChart data={chartData}>
                       <defs>
                         <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.3} />
+                          <stop offset="5%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.8} />
                           <stop offset="95%" stopColor="hsl(216, 87%, 45%)" stopOpacity={0.1} />
                         </linearGradient>
                       </defs>
@@ -974,8 +976,9 @@ export default function URLDetail() {
                         stroke="hsl(216, 87%, 45%)"
                         strokeWidth={2}
                         fill="url(#performanceGradient)"
-                        dot={{ r: 4, fill: "hsl(216, 87%, 45%)", strokeWidth: 2, stroke: '#fff' }}
-                        activeDot={{ r: 6, fill: "hsl(216, 87%, 45%)", strokeWidth: 2, stroke: '#fff' }}
+                        fillOpacity={0.4}
+                        dot={false}
+                        activeDot={{ r: 4, fill: "hsl(216, 87%, 45%)", stroke: "hsl(216, 87%, 45%)" }}
                       />
                       </AreaChart>
                     </ResponsiveContainer>
